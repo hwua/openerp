@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- 班级tree视图-->
+        <record id="view_classto_tree" model="ir.ui.view">
+            <field name="name">view.classto.tree</field>
+            <field name="model">classto.account</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="class_number"/>
+                    <field name="class_leader"/>
+                    <field name="core"/>
+                    <field name="date1"/>
+                    <field name="date2"/>
+                </tree>
+            </field>
+        </record>
+        <!-- 班级search视图-->
+        <record id="view_classto_search" model="ir.ui.view">
+            <field name="name">view.classto.search</field>
+            <field name="model">classto.account</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="class_leader"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- 班级form视图-->
+        <record id="view_classto_form" model="ir.ui.view">
+            <field name="name">view.classto.form</field>
+            <field name="model">classto.account</field>
+            <field name="arch" type="xml">
+                <form>
+                 <header>
+                  <button name="btn_ldap" type="object" attrs="{'invisible':True}"
+                   string="LDAP" class="oe_highlight"/>
+               </header>
+               <sheet>
+                <div class="oe_title">
+                    <label for="name" class="oe_edit_only"/>
+                    <h1><field name="name" placeholder="班级名称" required="1"/></h1>
+                </div>
+                <notebook>
+                    <page name="public" string="班级">
+                        <group>
+                            <group string="基本信息">
+                                <field name="class_number"/>
+                                <field name="class_leader"/>
+                                <field name="core"/>                
+                                <field name="class_type"/>
+                                <field name="class_statu"/>
+                                <field name="remarks"/>                
+                            </group>
+                            <group string="开班毕业时间">
+                                <field name="date1"/>
+                                <field name="date2"/>
+                                <group string="所属公司">
+                                    <field name="company"/>
+                                </group>
+                            </group>
+                        </group>               
+                    </page>
+                    <page name="public" string="课程表">
+                        <field name="curriculum"/>
+                    </page>
+                    <page name="public" string="班级学员">
+                        <field name="kehu_ids">
+                         <tree editable="bottom">
+                          <field name="name" readonly="1"/>
+                          <field name="res_sex"/>
+                          <!-- <field name="employment_state"/> -->
+                          <!-- <field name="contact_name" string="联系方式"/> -->
+                          <field name="birthdate"/>
+                          <field name="res_identity_id"/>
+                          <field name="res_email" readonly="1"/>
+                          <field name="res_biye"/>
+                          <field name="res_edu"/>
+                          <field name="res_zhuanye"/>
+                      </tree>
+                  </field>
+              </page>
+          </notebook>
+      </sheet>
+  </form>
+</field>           
+</record>      
+</data>
+</openerp>

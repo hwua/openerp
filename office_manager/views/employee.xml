@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    <record id="hr_employee_view_search_add_state" model="ir.ui.view">
+      <field name="name">hr.employee.view.search</field>
+      <field name="model">hr.employee</field>
+      <field name="inherit_id" ref="hr.view_employee_filter"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='department_id']/.." position="inside">
+          <filter name="state_draft" string="待审批" domain="[('state', '=', 'draft'),('active','=',False)]"/>
+          <filter name="state_underway" string="审批中" domain="[('state', '=', 'underway'),('active','=',False)]"/>
+          <filter name="state_ready" string="待到岗" domain="[('state', '=', 'ready'),('active','=',False)]"/>
+          <filter name="state_exam" string="入职测试" domain="[('state', '=', 'exam')]"/>
+        </xpath>
+      </field>
+    </record>
+
+    <record id="view_hr_employee_state_tree" model="ir.ui.view">
+      <field name="name">view.hr_employee_state.tree</field>
+      <field name="model">hr.employee</field>
+      <field name="arch" type="xml">
+        <tree string="Employees" decoration-bf="message_needaction==True" create="false">
+          <field name="state"/>
+          <field name="name"/>
+          <field name="work_phone"/>
+          <field name="work_email"/>
+          <field name="company_id" groups="base.group_multi_company"/>
+          <field name="department_id"/>
+          <field name="job_id"/>
+          <field name="parent_id"/>
+          <field name="coach_id" invisible="1"/>
+          <field name="message_needaction" invisible="1"/>
+        </tree>
+      </field>
+    </record>
+    
+    <record id="view_update_hr_employee_form" model="ir.ui.view">
+      <field name="name">update_hr_user_form</field>
+      <field name="model">hr.employee</field>
+      <field name="inherit_id" ref="hr.view_employee_form"/>
+      <field name="arch" type="xml">
+        <sheet position="before">
+          <header>
+            <button name="want_approval" type="object" string="建立账号" class="btn-primary oe_read_only" attrs="{'invisible':['|',('department_id','=',False), ('state','!=','ready')]}"  confirm="接下来的操作将为员工建立账号，请确保员工信息已填写完善"/>
+            <button name="start_approval" type="object" string="开始入职" class="btn-primary oe_read_only" attrs="{'invisible':['|','|',('department_id','=',False), ('state','=','ready'), ('state','!=','draft')]}" confirm="您确认此员工进入入职流程？请确保OS与ERP权限已设置"/>
+            <button name="pass_approval" type="object" string="直接通过" class="oe_read_only" attrs="{'invisible':['|','|',('department_id','=',False), ('state','=','ready'), ('state','!=','draft')]}" confirm="请注意，此操作将跳过入职审批,直接完成入职" help="可直接跳过审批，完成入职"/>
+            <!-- <button name="set_pass" type="object" string="通过" class="btn-primary oe_read_only" attrs="{'invisible':[('state', '!=', 'underway')]}" confirm="您确认要审批通过？"/> -->
+            <!-- <button name="start_leaving" type="object" string="开始离职" class="oe_read_only" attrs="{'invisible':[('state', '!=', False)]}" confirm="您确认此员工开始离职流程？"/> -->
+            <field name="state" widget="statusbar" attrs="{'invisible':[('state','=',False)]}" clickable="True"/>
+          </header>
+        </sheet>
+
+        <div name="button_box" position="attributes">
+          <attribute name="attrs">{'invisible':[('state','in',['draft','underway','ready'])]}</attribute>
+        </div>
+
+        <xpath expr="//field[@name='has_badges']/.." position="attributes">
+          <attribute name="attrs">{'invisible':[('state','in',['draft','underway'])]}</attribute>
+        </xpath>
+
+        <!-- user_id为只读，防止联系到现有的账号 -->
+        <field name="user_id" position="attributes">
+          <attribute name="attrs">{'readonly':[('state','in',['draft','underway','ready'])]}</attribute>
+        </field>
+
+        <field name="user_id" position="after">
+          <field name="default_password" attrs="{'invisible':[('state','!=','ready')]}"/>
+        </field>
+
+        <xpath expr="//notebook" position="inside">
+          <page string="OS权限" attrs="{'required':[('state','in',['draft','underway','ready'])]}">
+            <field name="role" widget="many2many_checkboxes"/>
+          </page>
+          <page string="ERP权限" attrs="{'required':[('state','in',['draft','underway','ready'])]}">
+            <button name="action_go_to_user" type="object" style="width:100%;margin:2% 0;box-shadow:0 0 12px 1px #337ab7;">
+              <group>
+                <group>
+                  <field name="user_info_mail"/>
+                  <field name="user_info_create_time"/>
+                  <field name="user_info_login_time"/>
+                </group>
+                <group>
+                  <field name="user_info_role"/>
+                </group>
+              </group>
+            </button>
+          </page>
+          <page string="入职审批" attrs="{'invisible':[('state','=',False)]}">
+            <!-- <label for="notify_person"/>
+            <field name="notify_person"/> -->
+            <field name="approvers_line"/>
+          </page>
+        </xpath>
+      </field>
+    </record>
+
+    <record id="view_hr_employee_os_tree" model="ir.ui.view">
+      <field name="name">设置</field>
+      <field name="model">hr.employee.os</field>
+      <field name="arch" type="xml">
+        <tree editable="bottom">
+          <field name="o_id"/>
+          <field name="name"/>
+        </tree>
+      </field>
+    </record>
+    
+    <!-- 入职测试员工的精简试图 -->
+    <record id="view_hr_smarty_employee_form" model="ir.ui.view">
+      <field name="name">view.hr_smarty_employee.form</field>
+      <field name="model">hr.employee</field>
+      <field name="arch" type="xml">
+        <form string="员工">
+          <header>
+            <field name="state" widget="statusbar" attrs="{'invisible':[('state','=',False)]}"/>
+          </header>
+          <sheet>
+            <div class="oe_button_box" name="button_box" attrs="{'invisible':[('state','in',['draft','underway','ready'])]}" modifiers="{'invisible': [['state', 'in', ['draft', 'underway', 'ready']]]}">
+              <button class="oe_stat_button" help="切换到完整信息" icon="fa-pencil-square-o" name="see_all" type="object">
+                <span>查看完整信息</span>
+              </button>
+            </div>
+            <field class="oe_avatar" name="image" options="{'preview_image':'image_medium'}" widget="image" modifiers="{}"/>
+            <div class="oe_title">
+              <label class="oe_edit_only" for="name"/>
+              <h1>
+                <field name="name" placeholder="员工姓名" modifiers="{'required': true}"/>
+              </h1>
+            </div>
+            <notebook>
+              <page string="入职测试">
+                <p class="oe_grey">
+                  选择为员工开通的测试，用作发送邮件
+                </p>
+                <field name="survey_questions" widget="many2many_checkboxes" nolabel="1"/>
+                
+                <button name="give_notice" string="测试提醒" class="btn-primary oe_read_only" type="object"/>
+                <p class="oe_grey">
+                  员工已完成的测试
+                </p>
+                <field name="survey_ids" nolabel="1"/>
+              </page>
+
+              <page string="HR 设置">
+                <group>
+                  <group name="active_group" string="状态">
+                    <field name="department_id"/>
+                    <field name="company_id" can_create="true" can_write="true" modifiers="{}"/>
+                    <field context="{'default_groups_ref': ['base.group_user']}" name="user_id" attrs="{'readonly':[('state','in',['draft','underway','ready'])]}" can_create="true" can_write="true" modifiers="{'readonly': [['state', '!=', false]]}"/>
+                    <field name="default_password"/>
+                  </group>
+                </group>
+              </page>
+            </notebook>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+  </data>
+</openerp>

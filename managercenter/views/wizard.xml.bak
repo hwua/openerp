@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<!-- 修改res.partner -->
+		<record id="view_inherit_res_partner_form" model="ir.ui.view">
+			<field name="name">inherit_res_partner_form</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="base.view_partner_form"/>
+			<field name="arch" type="xml">
+				<field name="company_type" position="replace">
+					<field name="res_company_type" widget="radio" options="{'horizontal': true}" attrs="{'invisible':True}"/>
+				</field>
+				<div class="o_address_format" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</div>
+
+				<field name="parent_id" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</field>
+
+				<field name="website" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</field>
+				<field name="function" position="attributes">
+					<attribute name="invisible">1</attribute> 
+				</field>
+				<field name="phone" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</field>
+				<field name="mobile" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</field>
+				<field name="fax" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</field>
+				<field name="email" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</field>
+				<field name="title" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</field>	
+				<field name="lang" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</field>
+				<field name="category_id" position="attributes">
+					<attribute name="invisible">1</attribute>
+				</field>
+			</field>
+		</record>
+
+		<!-- 修改res.partner 客户tree视图  -->
+		<record id="view_inherit_res_partner_tree" model="ir.ui.view">
+			<field name="name">inherit_res_partner_tree</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="base.view_partner_tree"/>
+			<field name="arch" type="xml">
+				<field name="display_name" position="after">
+					<field name="res_company_type"/>
+				</field>
+				<field name="email" position="after">
+					<field name="judge_done" attrs="{'invisible':[('res_company_type','!=','res_student')]}"/>
+				</field>
+			</field>
+		</record>
+			
+		<record id="view_build_res_partner_form" model="ir.ui.view">
+			<field name="name">build_res_partner_form</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="base.view_partner_form"/>
+			<field name="arch" type="xml">
+				<field name="type" position="before">
+					<group string="基础信息">
+						<!-- 性别(学生) -->
+						<field name="res_sex" widget="radio" options="{'horizontal': true}"
+							attrs="{'invisible':[('res_company_type','!=','res_student')]}"/>
+						<!-- 来源(学生) -->
+						<field name="res_from" 	
+							attrs="{'invisible':[('res_company_type','!=','res_student')]}"/>
+						<!-- QQ(学生)-->
+						<field name="res_qq"
+							attrs="{'invisible':[('res_company_type','!=','res_student')]}"/>
+						<!-- 身份证号(学生)-->
+						<field name="res_identity_id"
+							attrs="{'invisible':[('res_company_type','!=','res_student')]}"/>
+						<!-- 班级名称(学生) -->
+						<field name="kehu_id" 
+							attrs="{'invisible':[('res_company_type','!=','res_student')]}"/>
+						<!-- 是否全款(学生) -->
+						<field name="judge_done"
+							attrs="{'invisible':[('res_company_type','!=','res_student')]}"/>
+						<field name="res_address"/>
+						<!-- 网站(个体和公司) -->
+						<field name="res_website" widget="url" placeholder="e.g. www.odoo.com"
+							attrs="{'invisible':[('res_company_type','=','res_student')]}"/>
+						<field name="res_email"  widget="email" required="1"/>	
+					</group>
+					<group attrs="{'invisible':[('res_company_type','!=','res_student')]}"></group>
+					<group string="工作学习情况" attrs="{'invisible':[('res_company_type','!=','res_student')]}">
+						<field name="res_biye"/>
+						<field name="res_zhuanye"/>
+						<field name="res_nianfen"/>
+						<field name="res_edu" widget="radio" options="{'horizontal': true}"/>
+						<field name="res_work_experience" widget="radio" options="{'horizontal': true}"/>
+						<field name="res_trained_experience" widget="radio" options="{'horizontal': true}"/>
+					</group>
+				</field>
+				<field name="function" position="before">
+					<group string="联系信息">
+						<!-- 座机 -->
+						<field name="res_phone" widget="phone" attrs="{'invisible':[('res_company_type','=','res_student')]}"/>
+						<!-- 手机 -->
+						<field name="res_mobile" widget="phone"/>
+						<!-- 称谓 -->
+						<field name="res_title" attrs="{'invisible':['|',('res_company_type','=','res_student'),('res_company_type','=','res_company')]}"/>
+					</group>
+					<group attrs="{'invisible':[('res_company_type','!=','res_student')]}"></group>
+					<group string="紧急联系人" attrs="{'invisible':[('res_company_type','!=','res_student')]}">
+						<field name="res_guanxi"/>
+						<field name="res_jinji"/>
+						<field name="res_fangshi"/>
+					</group>
+				</field>
+
+			</field>
+		</record>
+	</data>
+</openerp>
+
+

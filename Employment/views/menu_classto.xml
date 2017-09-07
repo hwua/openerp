@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_classto_form_add_employment" model="ir.ui.view">
+            <field name="name">view.classto.form.add_employment</field>
+            <field name="model">classto.account</field>
+            <field name="inherit_id" ref="managercenter.view_classto_form"/>
+            <field name="arch" type="xml">
+                <field name="class_leader" position="after">
+                    <field name="class_professional_planner"/>           
+                </field>
+                <field name="class_statu" position="replace">
+                    <label for="class_statu"/>
+                    <div>
+                        <field name="class_statu" class="oe_inline"/>
+                        <button name="update_partner_state" string="标记就业" type="object" style="margin-left:100px;margin-top:-5px" class="oe_highlight oe_inline" attrs="{'invisible':['|',('class_statu', 'in', ('prep','graduation')),('class_statu', '=', False)]}" groups="managercenter.group_managercenter_02" confirm="确认开班？学员将被设置为在读状态"/>
+                        <button name="reset_partner_state" string="重置就业" type="object" style="margin-left:100px;margin-top:-5px" class="oe_inline oe_text_right"  attrs="{'invisible':['|',('class_statu', 'in', ('prep','start')),('class_statu', '=', False)]}" groups="managercenter.group_managercenter_01"  confirm="确认重置？学员将被重置为在读状态"/>
+                    </div>
+                </field>
+                <xpath expr="//sheet" position="after">
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- 继承并新建'班级管理'-->
+        <record id="view_employment_classto_tree" model="ir.ui.view">
+            <field name="name">view.employment_classto.tree</field>
+            <field name="model">classto.account</field>
+            <field name="inherit_id" ref="managercenter.view_classto_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//tree" position="replace">
+                    <tree colors="green:class_statu == 'start';blue:class_statu == 'prep';gray:class_statu == 'graduation';red:class_statu == False">
+                        <field name="name"/>
+                        <field name="class_number"/>
+                        <field name="date1"/>
+                        <field name="date2"/>
+                        <field name="core"/>
+                        <field name="class_statu"/>
+                        <field name="class_leader"/>
+                        <field name="class_professional_planner"/>
+                    </tree>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_employment_classto_form" model="ir.ui.view">
+            <field name="name">view.employment_classto.form</field>
+            <field name="model">classto.account</field>
+            <field name="context">{'res_company_type':'res_company' }</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="btn_ldap" type="object" attrs="{'invisible':True}"
+                            string="LDAP" class="oe_highlight"/>
+                        </header>
+                        <sheet>
+                            <div class="oe_title">
+                                <label for="name" class="oe_edit_only"/>
+                                <h1><field name="name" placeholder="班级名称" required="1"/></h1>
+                            </div>
+                            <notebook>
+                                <page name="public" string="班级">
+                                    <group>
+                                        <group string="基本信息">
+                                            <field name="class_number"/>
+                                            <field name="class_leader"/>
+                                            <field name="class_professional_planner"/>
+                                            <field name="core"/>
+                                            <field name="class_type"/>
+                                            <label for="class_statu"/>
+                                            <div>
+                                                <field name="class_statu" class="oe_inline"/>
+                                                <button name="update_partner_state" string="标记就业" type="object" style="margin-left:100px;margin-top:-5px" class="oe_highlight oe_inline" attrs="{'invisible':['|',('class_statu', 'in', ('prep','graduation')),('class_statu', '=', False)]}" groups="managercenter.group_managercenter_02" confirm="确认开班？学员将被设置为在读状态"/>
+                                                <button name="reset_partner_state" string="重置就业" type="object" style="margin-left:100px;margin-top:-5px" class="oe_inline oe_text_right"  attrs="{'invisible':['|',('class_statu', 'in', ('prep','start')),('class_statu', '=', False)]}" groups="managercenter.group_managercenter_01"  confirm="确认重置？学员将被重置为在读状态"/>
+                                            </div>
+                                            <field name="remarks"/>
+                                        </group>
+                                        <group string="开班毕业时间">
+                                            <field name="date1"/>
+                                            <field name="date2"/>
+                                            <group string="所属公司">
+                                                <field name="company"/>
+                                            </group>
+                                        </group>
+                                    </group>
+                                </page>
+                                <page name="public" string="课程表">
+                                    <field name="curriculum"/>
+                                </page>
+                                <page name="public" string="班级学员">
+                                    <field name="kehu_ids"/>
+                                </page>
+                            </notebook>
+                        </sheet>
+                        <div class="oe_chatter">
+                            <field name="message_follower_ids" widget="mail_followers"/>
+                            <field name="message_ids" widget="mail_thread"/>
+                        </div>
+                    </form>
+                    
+                </field>
+            </record>
+
+        </data>
+    </openerp>

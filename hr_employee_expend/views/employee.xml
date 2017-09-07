@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<!-- 修改员工列表的表单视图 -->
+		<record id="view_inherit_hr_employee_form" model="ir.ui.view">
+			<field name="name">inherit_res_user_form</field>
+			<field name="model">hr.employee</field>
+			<field name="inherit_id" ref="hr.view_employee_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='department_id']/.." position="after">
+					<group string="入职转正日期">
+						<field name="hr_worktime_from"/>
+						<field name="hr_worktime_zheng"/>
+					</group>
+				</xpath>
+				<field name="notes" position="after">
+					<field name="recommendation" placeholder="内部推荐"/>
+					<field name="referrer" placeholder="如认识我司在职或离职员工，姓名及关系"/>
+				</field>
+				<xpath expr="//page[@name='public']/.." position="inside">
+					<page string="社保与工资">
+						<group>
+							<group string="社保公积金基数">
+								<field name="shebaofuction_id"/>
+								<field name="shebaocompanymoneybase1"/>
+								<field name="shebaocompanymoneybase2"/>
+								<field name="shebaocompanymoneybase3"/>
+								<field name="shebaocompanymoneybase4"/>
+								<field name="shebaocompanymoneybase5"/>
+								<field name="gongcompanymoneybase"/>
+							</group>
+							<group string="社保公积金系数">
+								<field name="shebaogerenpercentage1"/>
+								<field name="shebaogerenpercentage2"/>
+								<field name="shebaogerenpercentage3"/>
+								<field name="shebaocomypercentage1"/>
+								<field name="shebaocomypercentage2"/>
+								<field name="shebaocomypercentage3"/>
+								<field name="shebaocomypercentage4"/>
+								<field name="shebaocomypercentage5"/>
+								<field name="gerenpercentage"/>
+								<field name="gongsipercentage"/>
+							</group>
+						</group>
+						<hr/>
+						<group>
+							<group string="工资基本信息">
+								<field name="tiaoxinriqi"/>
+								<field name="ruzhitime"/>
+								<field name="center_id"/>
+								<field name="hr_worktime_to"/>
+								<field name="ruzhitime_date" invisible="1"/>
+							</group>
+							<group string="正在使用工资基本信息">
+								<field name="basewages"/>
+								<field name="gangweijintiebasewages"/>
+								<field name="gangweijixiaobasewages"/>
+								<field name="guanlijixiaobasewages"/>
+							</group>
+							<group string="调薪后的工资基本信息">
+								<field name="basewageshou"/>
+								<field name="gangweijintiebasewageshou"/>
+								<field name="gangweijixiaobasewageshou"/>
+								<field name="guanlijixiaobasewageshou"/>
+							</group>
+						</group>
+					</page>
+				</xpath>
+			</field>
+		</record>
+
+		<record id="view_inherit_hr_employee_tree" model="ir.ui.view">
+			<field name="name">inherit_res_user_tree</field>
+			<field name="model">hr.employee</field>
+			<field name="inherit_id" ref="hr.view_employee_tree"/>
+			<field name="arch" type="xml">
+				<field name="company_id" position="after">
+					<field name="center_id"/>
+				</field>
+			</field>
+		</record>
+
+	</data>
+</openerp>

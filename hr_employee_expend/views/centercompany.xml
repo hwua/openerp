@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<openerp>
+	<data>
+		<!-- 定义所属中心动作  -->
+		<record id="view_center_company_action" model="ir.actions.act_window">
+			<field name="name">所属中心</field>
+			<field name="res_model">center.company</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+		<!-- 定义所属中心列表视图  -->
+		<record id="view_center_company_tree" model="ir.ui.view">
+			<field name="name">view.center.company.tree</field>
+			<field name="model">center.company</field>
+			<field name="arch" type="xml">
+				<tree>
+					<field name="name"/>
+					<field name="centermanger_employee"/>
+
+				</tree>
+			</field>
+		</record>
+
+		<!-- 定义所属中心搜索视图 -->
+		<record id="view_center_company_search" model="ir.ui.view">
+			<field name="name">view.center.company.search</field>
+			<field name="model">center.company</field>
+			<field name="arch" type="xml">
+				<search>
+					<field name="name"/>
+					<field name="centermanger_employee"/>
+				</search>
+			</field>
+		</record>
+
+		<!-- 定义所属中心表单视图 -->
+		<record id="view_center_company_from" model="ir.ui.view">
+			<field name="name">view.center.company.from</field>
+			<field name="model">center.company</field>
+			<field name="arch" type="xml">
+				<form>
+					<sheet>
+						<group>
+							<field name="name"/>
+							<field name="centermanger_employee"/>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+		<menuitem name="所属中心" id="center_company_tree" parent="hr.menu_human_resources_configuration" action="view_center_company_action"/>
+	</data>
+</openerp>
+

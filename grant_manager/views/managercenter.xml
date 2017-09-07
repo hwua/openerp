@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    <!-- 添加在学生管理中的补贴管理，给班主任发起检查补贴时使用 -->
+    <menuitem id="menu_students_grant" name="学生补贴" parent="managercenter.menu_students"/>
+
+    <record id="act_grant_partner_account_n" model="ir.actions.act_window">
+        <field name="name">待确认客户</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" ref="view_act_grant_partner_kanban"/>
+        <field name="view_id" ref="view_act_grant_partner_tree"/>
+        <field name="domain">[('customer','=',True),('kehu_id.class_leader.user_id','=',uid),('sale_grant_state','=','draft')]</field>
+    </record>
+
+    <record id="act_grant_partner_account_d" model="ir.actions.act_window">
+        <field name="name">发放中客户</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" ref="view_act_grant_partner_kanban"/>
+        <field name="view_id" ref="view_act_grant_partner_tree"/>
+        <field name="domain">[('customer','=',True),('kehu_id.class_leader.user_id','=',uid),('sale_grant_state','=','in')]</field>
+    </record>
+    
+    <record id="act_grant_partner_account_h" model="ir.actions.act_window">
+        <field name="name">已完毕的客户</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" ref="view_act_grant_partner_kanban"/>
+        <field name="view_id" ref="view_act_grant_partner_tree"/>
+        <field name="domain">[('customer','=',True),('kehu_id.class_leader.user_id','=',uid),('sale_grant_state','=','done')]</field>
+    </record>
+
+    <record id="act_grant_partner_account_o" model="ir.actions.act_window">
+        <field name="name">退费客户</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" ref="view_act_grant_partner_kanban"/>
+        <field name="view_id" ref="view_act_grant_partner_tree"/>
+        <field name="domain">[('customer','=',True),('kehu_id.class_leader.user_id','=',uid),('sale_grant_state','=','other')]</field>
+    </record>
+
+    <record id="act_students_grant_view_n" model="ir.actions.act_window.view">
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_act_grant_partner_kanban"/>
+        <field name="act_window_id" ref="act_grant_partner_account_n"/>
+    </record>
+
+    <record id="act_students_grant_view_d" model="ir.actions.act_window.view">
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_act_grant_partner_kanban"/>
+        <field name="act_window_id" ref="act_grant_partner_account_d"/>
+    </record>
+
+    <record id="act_students_grant_view_h" model="ir.actions.act_window.view">
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_act_grant_partner_kanban"/>
+        <field name="act_window_id" ref="act_grant_partner_account_h"/>
+    </record>
+
+    <record id="act_students_grant_view_o" model="ir.actions.act_window.view">
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_act_grant_partner_kanban"/>
+        <field name="act_window_id" ref="act_grant_partner_account_o"/>
+    </record>
+
+    <menuitem id="menu_students_grant_n" name="待确认" parent="menu_students_grant" action="act_grant_partner_account_n"/>
+    <menuitem id="menu_students_grant_d" name="发放中" parent="menu_students_grant" action="act_grant_partner_account_d"/>
+    <menuitem id="menu_students_grant_h" name="已完毕" parent="menu_students_grant" action="act_grant_partner_account_h"/>
+    <menuitem id="menu_students_grant_o" name="退费" parent="menu_students_grant" action="act_grant_partner_account_o"/>
+</data>
+</openerp>

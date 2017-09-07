@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<record id="base.menu_sale_config_loan_company" model="ir.actions.act_window">
+			<field name="name">贷款机构</field>
+			<field name="res_model">config_company</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+		<menuitem id="base.menu_sale_config_loan_config" name="金融方案" parent="base.menu_base_partner" sequence="102"/>
+
+		<menuitem id="base.menu_sale_config_loan_company_act" name="贷款机构" parent="base.menu_sale_config_loan_config" sequence="5" action="base.menu_sale_config_loan_company"/>
+
+		<!-- 贷款列表视图  -->
+		<record id="view_config_loan_company_tree" model="ir.ui.view">
+			<field name="name">view.config_loan_company.tree</field>
+			<field name="model">config_company</field>
+			<field name="arch" type="xml">
+				<tree>
+					<field name="name"/>
+					<field name="remarks"/>
+				</tree>
+			</field>
+		</record>
+
+		<!-- 贷款搜索视图 -->
+		<record id="view_config_loan_company_search" model="ir.ui.view">
+			<field name="name">view.config_loan_company.search</field>
+			<field name="model">config_company</field>
+			<field name="arch" type="xml">
+				<search>
+					<field name="name"/>
+				</search>
+			</field>
+		</record>
+
+		<!-- 贷款设置表单视图 -->
+		<record id="view_config_loan_company_form" model="ir.ui.view">
+			<field name="name">view.config_loan_company.form</field>
+			<field name="model">config_company</field>
+			<field name="arch" type="xml">
+				<form>
+					<sheet>
+						<div class="oe_button_box" name="button_box">
+							<button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+								<field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+							</button>
+						</div>
+
+						<h1>
+							<field name="name" placeholder="名称" required="1"/>
+						</h1>
+						<notebook>
+							<page string="方案列表">
+								<field name="project"/>
+							</page>
+							<page string="备注">
+								<field name="remarks"/>
+							</page>
+						</notebook>
+					</sheet>
+				</form>
+			</field>
+		</record>
+	</data>
+</openerp>

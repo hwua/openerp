@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    <record id="view_employment_company_jobs_tree" model="ir.ui.view">
+      <field name="name">view.employment_company_jobs.tree</field>
+      <field name="model">company_jobs</field>
+      <field name="arch" type="xml">
+        <tree editable="bottom">
+            <field name="name"/>
+            <field name="salary"/>
+            <field name="work"/>
+        </tree>
+      </field>
+    </record>
+    
+    <record id="view_employment_company_jobs_form" model="ir.ui.view">
+      <field name="name">view.employment_company_jobs.form</field>
+      <field name="model">company_jobs</field>
+      <field name="arch" type="xml">
+        <form editable="bottom">
+          <group>
+            <field name="name"/>
+            <field name="salary"/>
+            <field name="work"/>
+          </group>
+        </form>
+      </field>
+    </record>
+
+  </data>
+</openerp>

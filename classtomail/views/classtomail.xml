@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="view_classto_form_mail" model="ir.ui.view">
+            <field name="name">view.classto.form.mail</field>
+            <field name="model">classto.account</field>
+            <field name="inherit_id" ref="managercenter.view_classto_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='public'][last()]" position="after">
+                    <page name="public" string="发送邮件">
+                        <group>
+                            <label for="email_template" class="oe_inline"/>
+                            <div>
+                                <field name="email_template" string="选择模板" attrs="{'readonly': False}"/>
+                                <button name="send_loan_email" type="object" string="发送邮件" class="btn-primary"/>
+                            </div>
+                        </group>
+                        <group>
+                            <label for="email_from"/>
+                            <div>
+                                <field name="email_from"/>
+                            </div>
+                        </group>
+                        <group>
+                            <field name="email_time" string="发送记录"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="view_classto_tree_mail_new_time" model="ir.ui.view">
+            <field name="name">view.classto.tree.mail.new.time</field>
+            <field name="model">classto.account</field>
+            <field name="inherit_id" ref="managercenter.view_classto_tree"/>
+            <field name="arch" type="xml">
+                <field name="date2" position="after">
+                    <field name="email_new_time"/>
+                    <field name="email_time"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>

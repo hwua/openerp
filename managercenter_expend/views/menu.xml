@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+
+    <menuitem name="企业人才库" id="menu_company_and_manager"  sequence="1" />
+    <menuitem id="menu_students_employment_company2" name="企业管理" parent="menu_company_and_manager" sequence="1"  action="Employment.act_company_account"/>
+    <menuitem id="menu_students_already_employed2" name="人才库" parent="menu_company_and_manager"  sequence="2"  action="Employment.act_students_already_employed"/>
+
+    <menuitem name="就业服务" id="Employment.menu_employment_management" parent="managercenter.menu_top_student" sequence="4" ></menuitem>
+    <menuitem name="活动管理" id="menu_active" parent="managercenter.menu_top_student" sequence="5"  ></menuitem>
+    <menuitem name="访谈记录" id="menu_goutong" parent="managercenter.menu_top_student" sequence="6" action="managercenter_interview_action"></menuitem>
+    <menuitem name="考试列表" id="menu_testkaoshi" parent="managercenter.menu_top_student" sequence="7" action="examination_information_action"></menuitem>
+    <menuitem name="学生考试信息" id="menu_stukaoshi" parent="managercenter.menu_top_student" sequence="8" action="examination_student_action"></menuitem>
+
+    <menuitem name="学生活动管理" id="menu_active_stu" parent="menu_active" sequence="1"  action="managercenter_activity_action_stu"></menuitem>
+    <menuitem name="班级活动管理" id="menu_active_class" parent="menu_active" sequence="2"  action="managercenter_activity_action"></menuitem>
+  </data>
+</openerp>

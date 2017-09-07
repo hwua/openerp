@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    <menuitem id="employment_management" name="就业管理"/>
+    <menuitem id="menu_employment" name="就业管理" parent="employment_management"/>
+
+<!-- 班级管理 -->
+    <record id="act_classto_account" model="ir.actions.act_window">
+        <field name="name">班级管理</field>
+        <field name="res_model">classto.account</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="act_classto_account_tree" model="ir.actions.act_window.view">
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_employment_classto_tree" />
+        <field name="act_window_id" ref="act_classto_account" />
+    </record>
+    
+    <record id="act_classto_account_form" model="ir.actions.act_window.view">
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_employment_classto_form" />
+        <field name="act_window_id" ref="act_classto_account" />
+    </record>
+
+    <menuitem id="menu_students_employment_classto" name="班级管理" sequence="1" parent="menu_employment" action="act_classto_account"/>
+
+
+<!-- 企业管理 -->
+    <record id="act_company_account" model="ir.actions.act_window">
+        <field name="name">企业管理</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('res_company_type','=','res_company'),('customer','=',False)]</field>
+    </record>
+
+    <record id="act_company_account_tree" model="ir.actions.act_window.view">
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_employment_company_tree" />
+        <field name="act_window_id" ref="act_company_account" />
+    </record>
+
+
+    <record id="act_company_account_form" model="ir.actions.act_window.view">
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_employment_company_form" />
+        <field name="act_window_id" ref="act_company_account" />
+    </record>
+    
+    <menuitem id="menu_students_employment_company" name="企业管理" sequence="2" parent="menu_employment" action="act_company_account"/>
+
+<!-- 就业服务 -->
+    <menuitem id="menu_employment_management" name="就业服务" sequence="3"  parent="menu_employment"/>
+    <menuitem id="menu_students_not_employed" name="待就业" parent="menu_employment_management" action="act_students_not_employed"/>
+    <menuitem id="menu_students_already_employed" name="已就业" parent="menu_employment_management" action="act_students_already_employed"/>
+
+  </data>
+</openerp>

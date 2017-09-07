@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    
+    <!-- 待就业的tree由'姓名'和'待就业'组成 -->
+    <record id="view_act_students_employed_not_employed_tree" model="ir.ui.view">
+      <field name="name">view.act_students_not_employed_already_employed.tree</field>
+      <field name="model">res.partner</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name" string="姓名"/>
+          <field name="res_sex"/>
+          <field name="res_mobile"/>
+          <field name="res_biye"/>
+          <field name="res_zhuanye"/>
+          <field name="res_edu"/>
+          <field name="res_nianfen"/>
+          <field name="interview_record"/>
+          <field name="employment_state"/>
+        </tree>
+      </field>
+    </record>
+
+    <!-- 已就业的tree由'姓名'和'公司'组成 -->
+    <record id="view_act_students_employed_already_employed_tree" model="ir.ui.view">
+      <field name="name">view.act_students_not_employed_already_employed.tree</field>
+      <field name="model">res.partner</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name" string="姓名"/>
+          <field name="res_sex"/>
+          <field name="employment_date"/>
+          <field name="employment_way"/>
+          <field name="employment_show_company"/>
+          <field name="employment_job"/>
+          <field name="employment_salary"/>
+          <field name="employment_area"/>
+          <field name="interview_record"/>
+        </tree>
+      </field>
+    </record>
+
+    <!-- 仅看到待就业状态学生，并对其进行班级分组 -->
+    <record id="act_students_not_employed" model="ir.actions.act_window">
+      <field name="name">待就业</field>
+      <field name="res_model">res.partner</field>
+      <field name="view_id" ref="view_act_students_employed_not_employed_tree"/>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+      <field name="domain">[('employment_state','=','ne'),('res_company_type','!=','res_company')]</field>
+      <field name="context">{'group_by':'kehu_id'}</field>
+    </record>
+
+
+   <!-- 仅看到已就业状态学生，并对其进行班级分组 -->
+    <record id="act_students_already_employed" model="ir.actions.act_window">
+      <field name="name">已就业</field>
+      <field name="res_model">res.partner</field>
+      <field name="view_id" ref="view_act_students_employed_already_employed_tree"/>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+      <field name="domain">[('employment_state','=','he'),('res_company_type','!=','res_company')]</field>
+      <field name="context">{'group_by':'kehu_id'}</field>
+    </record>
+
+  </data>
+</openerp>

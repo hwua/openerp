@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+<!--         <record id="view_employment_interview_record_tree_inher" model="ir.ui.view">
+          <field name="name">view.employment_interview_record.treeinher</field>
+          <field name="model">interview_record</field>
+          <field name="inherit_id" ref="Employment.view_employment_interview_record_tree"/>
+          <field name="arch" type="xml">
+            <tree editable="bottom" >
+                <field name="studentname" position="before" />
+            </tree>
+          </field>
+        </record> -->
+        <record id="view_resp_inher" model="ir.ui.view">
+          <field name="name">view.res.partner.select.inher</field>
+          <field name="model">res.partner</field>
+          <field name="inherit_id" ref="base.view_res_partner_filter"/>
+          <field name="arch" type="xml">
+          <search> 
+            <field name="employment_date"/>
+          </search>
+          </field>
+        </record>
+        <record id="view_classto_form_add_employment222" model="ir.ui.view">
+            <field name="name">view.classto.form.add_employment22</field>
+            <field name="model">classto.account</field>
+            <field name="inherit_id" ref="managercenter.view_classto_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='public'][last()]" position="after">
+                    <page name="public" string="考试信息">
+                             <field name="Examinationinformation_ids"/>
+                    </page>
+                    <page name="public" string="考勤管理">
+                              <field name="attendance_ids"  />
+                    </page>
+                    <page name="public" string="活动管理">
+                             <field name="managercenteractivity_ids" position="inside">
+                                  <tree editable="bottom">
+                                      <field name="studentname"/>
+                                      <field name="activitytime"/>
+                                      <field name="activitydate"/>
+                                      <field name="activitynumber"/>
+                                      <field name="activityurl"/>
+                                      <field name="activityadress"/>
+                                      <field name="classteacher"/>
+                                      <field name="activitytype"/>
+                                      <field name="activitycenter"/>
+                                      <field name="activitybei"/>
+                                  </tree>
+                              </field>
+                    </page>
+                    <page name="public" string="访谈管理">
+                            <field name="managercenterinterview_ids" position="inside">
+                                <tree editable="bottom">
+                                    <field name="studentname"/>
+                                    <field name="interviewtime"/>
+                                    <field name="interviewtype"/>
+                                     <field name="interviewpre"/>
+                                     <field name="interviewresult"/>
+                                     <field name="interviewfeedneed"/>     
+                                     <field name="interviewfeedjie"/>                 
+                                    <field name="interviewfeedselt"/>
+                                    <field name="interviewfeedteach"/>
+                                    <field name="interviewbei"/>
+                                </tree>
+                              </field>
+                    </page>
+                    <page name="public" string="就业服务">
+                             <field name="interview_records" position="inside">
+                                <tree editable="bottom">
+                                    <field name="studentname"/>
+                                    <field name="record"/>
+                                    <field name="time"/>
+                                </tree>
+                              </field>
+                    </page>
+                </xpath>
+                  <field name="curriculum" position="inside">
+                      <tree editable="bottom">
+                        <field name="name"/>
+                        <field name="course_name_number"/>
+                        <field name="lesson"/>
+                        <field name="time"/>
+                        <field name="timeto"/>
+                        <field name="employee_id" string='讲师'/>
+                        <field name="describe"/>
+                      </tree>
+                  </field> 
+            </field>
+        </record>
+
+        <record id="view_respartner_form78" model="ir.ui.view">
+            <field name="name">view.res.partner.form78</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+               <xpath expr="//notebook[last()]/page" position="before">
+                    <page name="public" string="考勤管理">
+                         <field name="resattendance_ids" position="inside">
+                           <tree editable="bottom">
+                              <field name="create_date"/>
+                              <field name="type"/>
+                              <field name="time"/>
+                              <field name="comments"/>
+                           </tree>
+                         </field> 
+                    </page>
+                    <page name="public" string="活动管理">
+                         <field name="resactivity_ids" position="inside">
+                            <tree editable="bottom">
+                                <field name="activitytime"/>
+                                <field name="activitydate"/>
+                                <field name="activitynumber"/>
+                                <field name="activityurl"/>
+                                <field name="activityadress"/>
+                                <field name="classteacher"/>
+                                <field name="activitytype"/>
+                                <field name="activitycenter"/>
+                                <field name="activitybei"/>
+                            </tree>
+                        </field>
+                    </page>
+                    <page name="public" string="访谈管理">
+                          <field name="resinterview_ids" position="inside">
+                            <tree editable="bottom">
+                                <field name="interviewtime"/>
+                                <field name="interviewtype"/>
+                                 <field name="interviewpre"/>
+                                 <field name="interviewresult"/>
+                                 <field name="interviewfeedneed"/>     
+                                 <field name="interviewfeedjie"/>                 
+                                <field name="interviewfeedselt"/>
+                                <field name="interviewfeedteach"/>
+                                <field name="interviewbei"/>
+                            </tree>
+                          </field>
+                    </page>
+                    <page name="public" string="考试信息">
+                        <field name="resinformation_ids" position="inside">
+                            <tree editable="bottom">
+                                <field name="score"/>
+                                <field name="mail"/>
+                                <field name="post_time"/>
+                                <field name="teacher"/>
+                                <field name="url_result"/>
+                            </tree>
+                        </field>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+      <record id="view_course_account_to_treeinherit" model="ir.ui.view">
+        <field name="name">教师管理</field>
+        <field name="model">course.account.to</field>
+        <field name="inherit_id" ref="teaching.view_course_account_to_tree"/>
+        <field name="arch" type="xml">
+          <tree >
+                <field name="timeto" position="after"/>
+          </tree>
+        </field>
+      </record>
+        <record id="view_courseaccountto_forma" model="ir.ui.view">
+            <field name="name">view.course.account.to.forma</field>
+            <field name="model">course.account.to</field>
+            <field name="inherit_id" ref="teaching.view_course_account_to_form"/>
+            <field name="arch" type="xml">
+                <field name="time" position="after">
+                    <field name="timeto" />
+                </field>
+            </field>
+        </record>
+
+  </data>
+</openerp>

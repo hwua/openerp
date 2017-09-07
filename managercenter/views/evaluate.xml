@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<openerp>
+	<data>
+		
+		<record id="view_evaluate_tree" model="ir.ui.view">
+			<field name="name">view.evaluate.tree</field>
+			<field name="model">evaluate.account</field>
+			<field name="arch" type="xml">
+				<tree>
+					<field name="name"/>
+					<field name="unit"/>
+					<field name="salary"/>
+				</tree>
+			</field>
+		</record>
+
+		<record id="view_evaluate_search" model="ir.ui.view">
+			<field name="name">view.evaluate.search</field>
+			<field name="model">evaluate.account</field>
+			<field name="arch" type="xml">
+				<search>
+					<field name="name"/>
+					<field name="unit"/>
+					<field name="salary"/>
+				</search>
+			</field>
+		</record>
+
+		<record id="view_evaluate_form" model="ir.ui.view">
+			<field name="name">view.evaluate.form</field>
+			<field name="model">evaluate.account</field>
+			<field name="arch" type="xml">
+				<form>
+					<sheet>
+						<div class="oe_title">
+							<label for="name" class="oe_edit_only"/>
+							<h1><field name="name" placeholder="学员姓名" required="1"/></h1>
+						</div>
+						<notebook>
+							<page name="public" string="学员信息">
+								<group string="学员动态">
+									<field name="unit"/>
+									<field name="salary"/>
+									<field name="evaluate"/>
+									<field name="remarks"/>
+								</group>
+							</page>
+						</notebook>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+	</data>
+</openerp>

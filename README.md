@@ -1,1 +1,1 @@
-# openerp
+# odoo

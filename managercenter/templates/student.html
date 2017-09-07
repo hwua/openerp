@@ -1,0 +1,21 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html" charset="utf-8">
+	</head>
+	<body>
+		<dl>
+			<dt><p>Hi {{name}}:</p></dt>
+			<dd>
+			<p>
+			你选择了一下课程:
+			{% for course in products %}
+				{{course}}
+			{% endfor%}
+			</p>
+			</dd>
+		</dl>
+	</body>
+</html>
+
+
+

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+          <!-- 定义学生考试动作 -->
+        <record id="examination_student_action"  model="ir.actions.act_window">
+            <field name="name">学生考试管理</field>
+            <field name="res_model">examination.student</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+       <!-- 定义学生考试搜索视图 -->
+        <record id="view_examination_student_search" model="ir.ui.view">
+        <field name="name">view.examination.student.search</field>
+        <field name="model">examination.student</field>
+        <field name="arch" type="xml"> 
+          <search> 
+            <field name="studentname"/>
+            <field name="classtoaccount_id"/>
+            <field name="teacher"/>
+            <group expand="0" string="Group By">
+              <filter string="学生班级" domain="[]" context="{'group_by':'classtoaccount_id'}"/>
+              <filter string="老师" domain="[]" context="{'group_by':'teacher'}"/>
+            </group>
+          </search>
+        </field>
+      </record>
+
+      <!-- 定义学生考试tree视图 -->
+        <record id="view_examination_student_tree" model="ir.ui.view">
+            <field name="name">view.examination.student.tree</field>
+            <field name="model">examination.student</field>            
+            <field name="arch" type="xml">
+                <tree create="false" default_order="post_time desc">
+                    <field name="studentname"/> 
+                    <field name="classtoaccount_id"/>
+                    <field name="teacher"/>
+                    <field name="score"/>
+                    <field name="mail"/>
+                    <field name="post_time"/>
+                    <field name="url_result"/>
+                </tree>    
+            </field>
+        </record>
+      <!-- 定义学生考试form视图 -->
+         <record id="view_examination_student_form" model="ir.ui.view">
+            <field name="name">view.examination.student.form</field>
+            <field name="model">examination.student</field>
+            <field name="arch" type="xml">
+                <form create="false" edit="false">
+                      <group>
+                        <field name="name" invisible="1"/>
+                        <field name="studentname"/> 
+                        <field name="classtoaccount_id"/>
+                        <field name="teacher"/>
+                        <field name="score"/>
+                        <field name="mail"/>
+                        <field name="post_time"/>
+                        <field name="url_result"/>
+                      </group>
+                </form>  
+            </field>
+        </record>   
+    </data>
+</openerp>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <!-- 继承并新建'企业管理' -->
+        <record id="view_employment_company_tree" model="ir.ui.view">
+            <field name="name">view.employment_company.tree</field>
+            <field name="model">res.partner</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="cuid"/>
+                    <field name="name"/>
+                    <field name="res_professional_planner"/>
+                    <field name="company_size"/>
+                    <field name="contect_name" string="联系人"/>
+                    <field name="phone"/>
+                    <field name="comment" string='备注'/>
+					<!--<field name="company_id"/>-->
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_employment_company_form" model="ir.ui.view">
+            <field name="name">view.employment_company.form</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+              <xpath expr="//field[@name='res_qq']" position="replace">
+                </xpath>
+                <xpath expr="//field[@name='res_email']" position="replace">
+                </xpath>
+                <field name="res_mobile" position='after'>
+                    <field name="res_email" attrs="{'required':[('res_company_type','=','res_student')]}"/>
+                    <field name="res_qq" context="{'default_res_qq':'12'}"/>
+                    <label for='contect_name' string="联系方式"/>
+                    <div>
+                        <field name="contect_name" placeholder="姓名/称呼" attrs="{'invisible':[('res_company_type','!=','res_company')]}"/>
+                        <field name="phone" placeholder="电话"/>
+                    </div>
+                </field>
+                <field name="res_address" position='before'>
+                    <label for="company_size" attrs="{'invisible':[('res_company_type','!=','res_company')]}" class="oe_inline"/>
+                    <div attrs="{'invisible':[('res_company_type','!=','res_company')]}">
+                        <field name="company_size" class="oe_inline"/>人
+                    </div>
+                    <field name="employment_area" string='城市'/>
+                </field>
+                <field name="function" position="before">
+                    <span attrs="{'invisible':[('res_company_type','!=','res_company')]}"/>
+                    <group>
+                        <group string="职业规划师" attrs="{'invisible':[('res_company_type','!=','res_company')]}">
+                            <field name="res_professional_planner"/>
+                        </group>
+                    </group>
+                </field>
+                <xpath expr="//notebook[last()]/page" position="before">
+                    <page name="employment_management" string="就业岗位" attrs="{'invisible':[('res_company_type','==','res_student')]}" autofocus="autofocus">
+                        <field name="company_jobs" nolabel="1"/>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</openerp>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<record id="base.menu_sale_config_loan_project" model="ir.actions.act_window">
+			<field name="name">贷款方案</field>
+			<field name="res_model">config_project</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+<!-- 		<menuitem id="base.menu_sale_config_loan_project_act" name="贷款方案" parent="base.menu_sale_config_loan_config" sequence="7" action="base.menu_sale_config_loan_project"/>
+ -->
+		<record id="view_config_loan_project_tree" model="ir.ui.view">
+			<field name="name">view.config_loan_project.tree</field>
+			<field name="model">config_project</field>
+			<field name="arch" type="xml">
+				<tree>
+					<field name="name"/>
+					<field name="rate1"/>
+					<field name="repayment_rate1"/>
+					<field name="rate2"/>
+					<field name="repayment_rate2"/>
+					<field name="remarks"/>
+				</tree>
+			</field>
+		</record>
+
+		<record id="view_config_loan_project_form" model="ir.ui.view">
+			<field name="name">view.config_loan_project.form</field>
+			<field name="model">config_project</field>
+			<field name="arch" type="xml">
+				<form>
+					<sheet>
+						<div class="oe_button_box" name="button_box">
+							<button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+								<field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+							</button>
+						</div>
+						<group>
+							<field name="company_id" attrs="{'invisible':True}"/>
+							<field name="name" attrs="{'invisible':True}"/>
+							<field name="mo"/>
+							<label string="模式" class="oe_inline"/>
+							<div>
+								<field name="month1" class="oe_inline" attrs="{'required':True}"/>+
+								<field name="month2" class="oe_inline" attrs="{'required':True}"/>
+							</div>
+							<label string="宽限期" class="oe_inline"/>
+							<div>
+								利率<field name="rate1" class="oe_inline" attrs="{'required':True}"/>%/月
+								还款率<field name="repayment_rate1" class="oe_inline" attrs="{'required':True}"/>
+							</div>
+							<label string="还款期" class="oe_inline"/>
+							<div>
+								利率<field name="rate2" class="oe_inline" attrs="{'required':True}"/>%/月
+								还款率<field name="repayment_rate2" class="oe_inline" attrs="{'required':True}"/>
+							</div>
+							<field name="remarks"/>
+							<div>#如果有还款率，请务必填写，计算结果将会优先以还款率计算贷款数额</div>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+	</data>
+</openerp>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    <!-- 定义访谈动作 -->
+    <record id="managercenter_interview_action"  model="ir.actions.act_window">
+      <field name="name">访谈管理</field>
+      <field name="res_model">managercenter.interview</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- 定义访谈搜索视图 -->
+    <record id="view_managercenter_interview_search" model="ir.ui.view">
+      <field name="name">view.managercenter.interview.search</field>
+      <field name="model">managercenter.interview</field>
+      <field name="arch" type="xml"> 
+        <search> 
+          <field name="studentname"/>
+          <field name="managercenterinterview_id"/>
+          <field name="teachername"/>
+          <field name="interviewfeedselt"/>
+          <field name="interviewfeedteach"/>
+          <group expand="0" string="Group By">
+
+            <filter string="学生班级" domain="[]" context="{'group_by':'managercenterinterview_id'}"/>
+            <filter string="是否需要再沟通" domain="[]" context="{'group_by':'interviewfeedselt'}"/>
+            <filter string="是否反馈任课老师" domain="[]" context="{'group_by':'interviewfeedteach'}"/>
+            <filter string="访谈时间" domain="[]" context="{'group_by':'interviewtime'}"/> 
+          </group>
+        </search>
+
+      </field>
+    </record>
+
+    <!-- 定义访谈tree视图 -->
+    <record id="view_managercenter_interview_tree" model="ir.ui.view">
+      <field name="name">view.managercenter.interview.tree</field>
+      <field name="model">managercenter.interview</field>            
+      <field name="arch" type="xml">
+        <tree default_order="interviewtime desc" class="straight_line_no_line_feed">
+          <field name="studentname"/>
+          <field name="managercenterinterview_id"/>
+          <field name="teachername"/>
+          <field name="interviewtime"/>
+          <field name="interviewtype"/>
+          <field name="interviewpre"/>
+          <field name="interviewresult"/>
+          <field name="interviewfeedneed"/>     
+          <field name="interviewfeedjie"/>                 
+          <field name="interviewfeedselt"/>
+          <field name="interviewfeedteach"/>
+          <field name="interviewbei"/>
+        </tree>    
+      </field>
+    </record>
+    <!-- 定义访谈form视图 -->
+    <record id="view_managercenter_interview_form" model="ir.ui.view">
+      <field name="name">view.managercenter.interview.form</field>
+      <field name="model">managercenter.interview</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <group>
+              <field name="name" invisible="1"/>
+              <field name="studentname"/>
+              <field name="managercenterinterview_id"/>
+              <field name="teachername"/>
+              <field name="interviewtime"/>
+              <field name="interviewtype"/>
+              <field name="interviewpre"/>
+              <field name="interviewresult"/>
+              <field name="interviewfeedneed"/>     
+              <field name="interviewfeedjie"/>                 
+              <field name="interviewfeedselt"/>
+              <field name="interviewfeedteach"/>
+              <field name="interviewbei"/>
+            </group>
+          </sheet>
+          <div class="oe_chatter">
+            <field name="message_follower_ids" widget="mail_followers"/>
+            <field name="message_ids" widget="mail_thread"/>
+          </div>
+        </form>  
+      </field>
+    </record>   
+  </data>
+</openerp>

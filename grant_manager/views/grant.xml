@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    <!-- 新建的补贴管理窗口，给除去班主任的人员使用 -->
+    <record model="ir.ui.view" id="view_act_grant_partner_kanban">
+        <field name="name">res.partner.kanban</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <kanban class="o_res_partner_kanban" create="false">
+                <field name="color"/>
+                <field name="display_name"/>
+                <field name="title"/>
+                <field name="email"/>
+                <field name="parent_id"/>
+                <field name="is_company"/>
+                <field name="function"/>
+                <field name="phone"/>
+                <field name="street"/>
+                <field name="street2"/>
+                <field name="zip"/>
+                <field name="city"/>
+                <field name="country_id"/>
+                <field name="mobile"/>
+                <field name="sale_order_grant_count"/>
+                <field name="state_id"/>
+                <field name="category_id"/>
+                <field name="image"/>
+                <field name="type"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_res_partner_kanban">
+                            <div class="o_kanban_tags_section oe_kanban_partner_categories"/>
+                            <div class="o_kanban_image">
+                                <t t-if="record.image.raw_value">
+                                    <img t-att-src="kanban_image('res.partner', 'image_small', record.id.value)"/>
+                                </t>
+                                <t t-if="!record.image.raw_value">
+                                    <t t-if="record.type.raw_value === 'delivery'">
+                                        <img t-att-src='_s + "/base/static/src/img/truck.png"' class="o_kanban_image oe_kanban_avatar_smallbox"/>
+                                    </t>
+                                    <t t-if="record.type.raw_value === 'invoice'">
+                                        <img t-att-src='_s + "/base/static/src/img/money.png"' class="o_kanban_image oe_kanban_avatar_smallbox"/>
+                                    </t>
+                                    <t t-if="record.type.raw_value != 'invoice' &amp;&amp; record.type.raw_value != 'delivery'">
+                                        <t t-if="record.is_company.raw_value === true">
+                                            <img t-att-src='_s + "/base/static/src/img/company_image.png"'/>
+                                        </t>
+                                        <t t-if="record.is_company.raw_value === false">
+                                            <img t-att-src='_s + "/base/static/src/img/avatar.png"'/>
+                                        </t>
+                                    </t>
+                                </t>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="oe_partner_heading"><field name="display_name"/></strong>
+                                <ul>
+                                    <li t-if="record.parent_id.raw_value and !record.function.raw_value"><field name="parent_id"/></li>
+                                    <li t-if="!record.parent_id.raw_value and record.function.raw_value"><field name="function"/></li>
+                                    <li t-if="record.parent_id.raw_value and record.function.raw_value"><field name="function"/> at <field name="parent_id"/></li>
+                                    <li t-if="record.city.raw_value and !record.country_id.raw_value"><field name="city"/></li>
+                                    <li t-if="!record.city.raw_value and record.country_id.raw_value"><field name="country_id"/></li>
+                                    <li t-if="record.city.raw_value and record.country_id.raw_value"><field name="city"/>, <field name="country_id"/></li>
+                                    <li t-if="record.email.raw_value" class="o_text_overflow"><field name="email"/></li>
+                                </ul>
+                                <div class="oe_kanban_partner_links">
+                                    <button class="oe_button" type="action" name="%(act_res_partner_2_grant_sale_order)d" t-if="record.sale_order_grant_count.value">
+                                        <i class="fa fa-fw fa-plus-square"/>
+                                           补贴：<t t-esc="record.sale_order_grant_count.value"/>￥
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_act_grant_partner_tree" model="ir.ui.view">
+        <field name="name">申请补贴的客户</field>
+        <field name="model">res.partner</field>
+        <field name="arch" type="xml">
+            <tree class="grant_sale_order_tree" create="false">
+                <field name="name" string="姓名"/>
+                <field name="sale_order_grant_count"/>
+                <field name="sale_order_grant_next_count"/>
+                <field name="kehu_id"/>
+                <field name="sale_order_grant_message"/>
+                <button string="补贴订单" name="%(act_res_partner_2_grant_sale_order)d" type="action"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="act_partner_grant_n" model="ir.actions.act_window">
+        <field name="name">待确认客户</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" ref="view_act_grant_partner_kanban"/>
+        <field name="view_id" ref="view_act_grant_partner_tree"/>
+        <field name="domain">[('customer','=',True),('kehu_id','!=',False),('sale_grant_state','=','draft')]</field>
+    </record>
+
+    <record id="act_partner_grant_d" model="ir.actions.act_window">
+        <field name="name">发放中客户</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" ref="view_act_grant_partner_kanban"/>
+        <field name="view_id" ref="view_act_grant_partner_tree"/>
+        <field name="domain">[('customer','=',True),('kehu_id','!=',False),('sale_grant_state','=','in')]</field>
+    </record>
+
+    <record id="act_partner_grant_h" model="ir.actions.act_window">
+        <field name="name">已完毕的客户</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" ref="view_act_grant_partner_kanban"/>
+        <field name="view_id" ref="view_act_grant_partner_tree"/>
+        <field name="domain">[('customer','=',True),('kehu_id','!=',False),('sale_grant_state','=','done')]</field>
+    </record>
+
+    <record id="act_partner_grant_o" model="ir.actions.act_window">
+        <field name="name">退费客户</field>
+        <field name="res_model">res.partner</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">kanban,tree,form</field>
+        <field name="view_id" ref="view_act_grant_partner_kanban"/>
+        <field name="view_id" ref="view_act_grant_partner_tree"/>
+        <field name="domain">[('customer','=',True),('kehu_id','!=',False),('sale_grant_state','=','other')]</field>
+    </record>
+
+    <record id="act_partner_grant_view_n" model="ir.actions.act_window.view">
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_act_grant_partner_kanban"/>
+        <field name="act_window_id" ref="act_partner_grant_n"/>
+    </record>
+
+    <record id="act_partner_grant_view_d" model="ir.actions.act_window.view">
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_act_grant_partner_kanban"/>
+        <field name="act_window_id" ref="act_partner_grant_d"/>
+    </record>
+
+    <record id="act_partner_grant_view_h" model="ir.actions.act_window.view">
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_act_grant_partner_kanban"/>
+        <field name="act_window_id" ref="act_partner_grant_h"/>
+    </record>
+
+    <record id="act_partner_grant_view_o" model="ir.actions.act_window.view">
+        <field name="view_mode">kanban</field>
+        <field name="view_id" ref="view_act_grant_partner_kanban"/>
+        <field name="act_window_id" ref="act_partner_grant_o"/>
+    </record>
+
+    <menuitem id="grant_management" name="补贴管理" groups="account.group_account_user"/>
+    <menuitem id="grant_partner_grant" name="补贴客户" parent="grant_management"/>
+    <menuitem id="grant_partner_grant_n" name="待确认" parent="grant_partner_grant" action="act_partner_grant_n"/>
+    <menuitem id="grant_partner_grant_d" name="发放中" parent="grant_partner_grant" action="act_partner_grant_d"/>
+    <menuitem id="grant_partner_grant_h" name="已完毕" parent="grant_partner_grant" action="act_partner_grant_h"/>
+    <menuitem id="grant_partner_grant_o" name="退费" parent="grant_partner_grant" action="act_partner_grant_o"/>
+  </data>
+</openerp>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<!-- 定义社保公式动作  -->
+		<record id="view_shebao_fuction_action" model="ir.actions.act_window">
+			<field name="name">社保公式</field>
+			<field name="res_model">shebao.fuction</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+		<!-- 定义社保公式列表视图  -->
+		<record id="view_shebao_fuction_tree" model="ir.ui.view">
+			<field name="name">view.shebao.fuction.tree</field>
+			<field name="model">shebao.fuction</field>
+			<field name="arch" type="xml">
+				<tree>
+					<field name="name" invisible="1"/>
+					<field name="shebaocompany_id"/>
+					<field name="shebaogerenpercentage1"/>
+					<field name="shebaogerenpercentage2"/>
+					<field name="shebaogerenpercentage3"/>
+					<field name="shebaogerenpercentage4"/>
+					<field name="shebaocomypercentage1"/>
+					<field name="shebaocomypercentage2"/>
+					<field name="shebaocomypercentage3"/>
+					<field name="shebaocomypercentage4"/>
+					<field name="shebaocomypercentage5"/>
+					<field name="shebaocomypercentage6"/>
+					<field name="gerenpercentage"/>
+					<field name="gongsipercentage"/>
+				</tree>
+			</field>
+		</record>
+
+		<!-- 定义社保公式搜索视图 -->
+		<record id="view_shebao_fuction_search" model="ir.ui.view">
+			<field name="name">view.shebao.fuction.search</field>
+			<field name="model">shebao.fuction</field>
+			<field name="arch" type="xml">
+				<search>
+					<field name="name"/>
+				</search>
+			</field>
+		</record>
+
+		<!-- 定义社保公式表单视图 -->
+		<record id="view_shebao_fuction_from" model="ir.ui.view">
+			<field name="name">view.shebao.fuction.from</field>
+			<field name="model">shebao.fuction</field>
+			<field name="arch" type="xml">
+				<form>
+					<sheet>
+						<group>
+							<field name="name" invisible="1"/>
+							<field name="shebaocompany_id"/>
+							<field name="shebaogerenpercentage1"/>
+							<field name="shebaogerenpercentage2"/>
+							<field name="shebaogerenpercentage3"/>
+							<field name="shebaogerenpercentage4"/>
+							<field name="shebaocomypercentage1"/>
+							<field name="shebaocomypercentage2"/>
+							<field name="shebaocomypercentage3"/>
+							<field name="shebaocomypercentage4"/>
+							<field name="shebaocomypercentage5"/>
+							<field name="shebaocomypercentage6"/>
+							<field name="gerenpercentage"/>
+							<field name="gongsipercentage"/>
+						</group>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+		<menuitem name="社保公积金计算公式" id="shebao_fuction_three" parent="hr.menu_human_resources_configuration" action="view_shebao_fuction_action"/>
+	</data>
+</openerp>
+

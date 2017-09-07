@@ -1,0 +1,48 @@
+<openerp>
+	<data>
+		<record id="ldap_setting_id_0" model="ldap.configure">
+			<field name="ldap_server">139.196.108.136</field>
+			<field name="ldap_binddn">cn=Manager,dc=harmonywin,dc=com</field>
+			<field name="ldap_base">o=student,dc=harmonywin,dc=com</field>
+			<field name="ldap_server_port">389</field>
+			<field name="ldap_password">zheland1206</field>
+			<field name="student_password">{SSHA}5oXX8pVXMw5Q6fei0Nn0/uzx3CeAyfW1</field>
+			<!--<field name="is_available">0</field>-->
+		</record>
+		<record id="ldap_setting_id_1" model="ldap.configure">
+			<field name="ldap_server">139.196.179.29</field>
+			<field name="ldap_binddn">cn=Manager,dc=hwua,dc=com</field>
+			<field name="ldap_base">o=student,dc=hwua,dc=com</field>
+			<field name="ldap_server_port">389</field>
+			<field name="ldap_password">U2qnMdpJ14AWQXtZpTEFUR2rFznp7w</field>
+			<field name="student_password">{SSHA}5oXX8pVXMw5Q6fei0Nn0/uzx3CeAyfW1</field>
+			<!--<field name="is_available">1</field>-->
+		</record>
+        <!--  -->
+        <!--   <record id="object0" model="a.a"> -->
+        <!--     <field name="name">Object 0</field> -->
+        <!--     <field name="value">0</field> -->
+        <!--   </record> -->
+        <!--  -->
+        <!--   <record id="object1" model="a.a"> -->
+        <!--     <field name="name">Object 1</field> -->
+        <!--     <field name="value">10</field> -->
+        <!--   </record> -->
+        <!--  -->
+        <!--   <record id="object2" model="a.a"> -->
+        <!--     <field name="name">Object 2</field> -->
+        <!--     <field name="value">20</field> -->
+        <!--   </record> -->
+        <!--  -->
+        <!--   <record id="object3" model="a.a"> -->
+        <!--     <field name="name">Object 3</field> -->
+        <!--     <field name="value">30</field> -->
+        <!--   </record> -->
+        <!--  -->
+        <!--   <record id="object4" model="a.a"> -->
+        <!--     <field name="name">Object 4</field> -->
+        <!--     <field name="value">40</field> -->
+        <!--   </record> -->
+        <!--  -->
+    </data>
+</openerp>

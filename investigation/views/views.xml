@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<record id="investigation_inherit_survey_question_form" model="ir.ui.view">
+			<field name="name">调查分数</field>
+			<field name="model">survey.question</field>
+			<field name="inherit_id" ref="survey.survey_question_form"/>
+			<field name="arch" type="xml">
+				<field name="quizz_mark" position="replace">
+					<field name="quizz_mark"/>
+				</field>
+				<field name="question" position="after">
+					<field name="question_html"/>
+				</field>
+			</field>
+		</record>
+
+		<record id="investigation_inherit_survey_form" model="ir.ui.view">
+			<field name="name">调查</field>
+			<field name="model">survey.survey</field>
+			<field name="inherit_id" ref="survey.survey_form"/>
+			<field name="arch" type="xml">
+				<field name="title" position="replace">
+					<field name="title" placeholder="Survey Title"/>
+				</field>
+				<field name="auth_required" position="after">
+					<field name="disposable" help="此调查每个账号只能做一次"/>
+				</field>
+			</field>
+		</record>
+		
+		<!-- 将可编辑的成绩设为只读 -->
+		<record id="investigation_inherit_survey_user_input_form" model="ir.ui.view">
+			<field name="name">调查</field>
+			<field name="model">survey.user_input</field>
+			<field name="inherit_id" ref="survey.survey_user_input_form"/>
+			<field name="arch" type="xml">
+				<field name="user_input_line_ids" position="attributes">
+					<attribute name="attrs">{'readonly':'1'}</attribute>
+				</field>
+			</field>
+		</record>
+
+		<template id="disposable" name="Survey Disposable">
+			<t t-call="website.layout">
+				<div class="wrap">
+					<div class="container">
+						<div class="jumbotron mt32">
+							<h1>你已经完成此项调查</h1>
+							<p>本调查为一次性调查，您已完成，谢谢</p>
+						</div>
+					</div>
+				</div>
+			</t>
+		</template>
+
+	</data>
+</openerp>

@@ -1,0 +1,11 @@
+@charset "utf-8";
+.openerp .custom .oe_form_field_one2many, .openerp .oe_form_field_many2many {
+  overflow-y: hidden;
+  position:relative;
+}
+.openerp .custom .oe_list_content td,.openerp .custom .oe_list_content th {
+  white-space: nowrap;
+}
+.openerp .custom .oe_list_content > tbody > tr > td.oe_list_field_cell {
+  white-space: nowrap;
+}

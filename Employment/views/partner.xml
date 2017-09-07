@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    <!-- 继承并新建客户，添加page（就业管理），添加group（学习与就业） -->
+    <record id="view_inherit_res_partner_form_add_state" model="ir.ui.view">
+      <field name="name">inherit_res_partner_form_add_state</field>
+      <field name="model">res.partner</field>
+      <field name="inherit_id" ref="base.view_partner_form"/>
+      <field name="arch" type="xml">
+        <field name="phone" position="replace">
+        </field>
+
+        <xpath expr="//label[@for='street']" position="attributes">
+          <attribute name="invisible">1</attribute>
+        </xpath>
+<!-- 
+        <xpath expr="//notebook/page[position()]" position="attributes">
+          <attribute name="invisible">1</attribute>
+        </xpath> -->
+
+        <field name="function" position="before">
+          <span attrs="{'invisible':[('res_company_type','!=','res_student')]}"/>
+          <group>
+            <group name='employment' string='学习与就业' class="oe_title" attrs="{'invisible':[('res_company_type','!=','res_student')]}">
+              <field name="employment_state" widget="radio"/>
+            </group>
+          </group>
+        </field>
+
+        <xpath expr="//notebook[last()]/page" position="before">
+          <page name="employment_management" string="面试记录" attrs="{'invisible':[('res_company_type','==','res_company')]}" autofocus="autofocus">
+            <field name="interview_record" nolabel="1"/>
+          </page>
+          <page name="employment_management" string="就业管理" attrs="{'invisible':[('res_company_type','==','res_company')]}" autofocus="autofocus">
+           <group>
+             <field name="employment_way" attrs="{'required':['|',('employment_state','=','ne'),('employment_state','=','he')],'invisible':[('employment_state','!=','ne'),('employment_state','!=','he')]}"/>
+           </group>
+           <group>
+            <field name="employment_company" domain="[('res_company_type','=','res_company'),('customer','=',False)]" attrs="{'invisible':['|',('employment_state','=','se'),('employment_way','=','se')]}" string="就业单位" placeholder="请搜索/选择"/>
+            <field name="employment_custom_company" attrs="{'invisible':[('employment_state','!=','se'),('employment_way','!=','se')]}" string="就业单位" placeholder="请如实填写"/>
+            <field name="employment_show_company" attrs="{'invisible':1}"/>
+          </group>
+          <group>
+            <field name="employment_job"/>
+          </group>
+          <group>
+            <field name="employment_salary"/>
+          </group>
+          <group>
+            <field name="employment_date"/>
+          </group>
+          <group>
+            <field name="employment_area"/>
+          </group>
+        </page>
+      </xpath>
+
+    </field>
+  </record>
+
+</data>
+</openerp>

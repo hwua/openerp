@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<menuitem name="招聘需求" id="recruitment_information_top" sequence="2" parent="hr.menu_hr_root" action="recruitment_information_action"></menuitem>
+	</data>
+</openerp>

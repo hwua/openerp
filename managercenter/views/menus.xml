@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+  	<!-- 班级管理-->
+    <record id="act_classto_account" model="ir.actions.act_window">
+        <field name="name">班级管理</field>
+        <field name="res_model">classto.account</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- 中心管理动作-->
+    <record id="act_coreto_account" model="ir.actions.act_window">
+        <field name="name">中心管理</field>
+        <field name="res_model">coreto.account</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <!-- 课程管理动作-->
+    <record id="act_course_account" model="ir.actions.act_window">
+        <field name="name">课程管理</field>
+        <field name="res_model">course.account</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <!-- 学生评估动作-->
+    <record id="act_evaluate_account" model="ir.actions.act_window">
+        <field name="name">学生评估</field>
+        <field name="res_model">evaluate.account</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+	</record>
+
+    <!-- 菜单-->
+    <menuitem name="学生管理" id="menu_top_student" sequence="4"></menuitem>
+    <menuitem name="学生" id="menu_students" parent="menu_top_student"></menuitem>
+    <menuitem name="班级管理" id="menu_students_classto" parent="menu_students" action="act_classto_account"></menuitem>
+    <menuitem name="中心管理" id="menu_students_coreto" parent="menu_students" action="act_coreto_account"></menuitem>
+    <menuitem name="课程管理" id="menu_students_course" parent="menu_students" action="act_course_account"></menuitem>
+	<menuitem name="学生评估" id="menu_students_evaluate" parent="menu_students" action="act_evaluate_account"></menuitem>
+	<!--<menuitem name="配置Ldap" id="menu_ldap_setting" parent="menu_students" action="act_ldap_config"></menuitem>-->
+  </data>
+</openerp>

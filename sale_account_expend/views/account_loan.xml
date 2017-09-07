@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<!-- 会计发票新增贷款方案 -->
+		<record id="invoice_account_invoice_loan" model="ir.ui.view">
+			<field name="name">account.invoice.loan</field>
+			<field name="model">account.invoice</field>
+			<field name="inherit_id" ref="account.invoice_form"/>
+			<field name="arch" type="xml">
+				<field name="payment_term_id" position="after">
+					<field name="is_loan" attrs="{'readonly':[('move_name','!=',False)]}"/>
+					<field name="company" attrs="{'invisible':[('is_loan', '=', False)],'required':[('is_loan', '=', True)],'readonly':[('move_name','!=',False)]}" options="{'no_create_edit': 1}" />
+					<field name="company_project" domain="[('company_id', '=', company)]" attrs="{'invisible':[('company', '=', False)],'required':[('company', '!=', False)]}" options="{'no_create_edit': 1}" />
+					<field name="amount_down_payment" options='{"no_open": true}' attrs="{'invisible':[('amount_down_payment', '=', 0.0)]}"/>
+					<field name="amount_grant"  options='{"no_open": true}' attrs="{'invisible':[('company_project', '=', False)]}"/>
+				</field>
+
+				<field name="amount_tax" position="after">
+					<label for="amount_rate1" class="oe_inline" attrs="{'invisible':[('company_project', '=', False)]}"/>
+					<div  attrs="{'invisible':[('company_project', '=', False)]}">
+						<field name="amount_rate1" class="oe_inline" options='{"no_open": True}'/>%/月
+					</div>
+
+					<label for="amount_repayment_rate1" class="oe_inline" attrs="{'invisible':[('company_project', '=', False)]}"/>
+					<div  attrs="{'invisible':[('company_project', '=', False)]}">
+						<field name="amount_repayment_rate1" class="oe_inline" options='{"no_open": True}'/>
+					</div>
+
+					<label for="amount_rate2" class="oe_inline" attrs="{'invisible':[('company_project', '=', False)]}"/>
+					<div  attrs="{'invisible':[('company_project', '=', False)]}">
+						<field name="amount_rate2" class="oe_inline" options='{"no_open": True}'/>%/月
+					</div>
+
+					<label for="amount_repayment_rate2" class="oe_inline" attrs="{'invisible':[('company_project', '=', False)]}"/>
+					<div  attrs="{'invisible':[('company_project', '=', False)]}">
+						<field name="amount_repayment_rate2" class="oe_inline" options='{"no_open": True}'/>
+					</div>
+
+					<label for="amount_month1" class="oe_inline" attrs="{'invisible':[('company_project', '=', False)]}"/>
+					<div  attrs="{'invisible':[('company_project', '=', False)]}">
+						<field name="amount_month1" class="oe_inline" options='{"no_open": True}'/>期
+					</div>
+
+					<label for="amount_month2" class="oe_inline" attrs="{'invisible':[('company_project', '=', False)]}"/>
+					<div  attrs="{'invisible':[('company_project', '=', False)]}">
+						<field name="amount_month2" class="oe_inline" options='{"no_open": True}'/>期
+					</div>
+				</field>
+
+				<field name="amount_total" position="after">
+					<field name="amount_loan_total" class="oe_subtotal_footer_separator" attrs="{'invisible':[('company_project', '=', False)]}"/>
+				</field>
+			</field>
+		</record>
+
+	</data>
+</openerp>

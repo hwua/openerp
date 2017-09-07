@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    <menuitem id="menu_hr_employee_approval" name="员工入职" parent="hr.menu_hr_root"/>
+    <menuitem id="menu_hr_1" name="入职" parent="menu_hr_employee_approval"/>
+    <menuitem id="menu_hr_2" name="离职" parent="menu_hr_employee_approval"/>
+
+    <record id="act_menu_hr_employee_os" model="ir.actions.act_window">
+      <field name="name">配置</field>
+      <field name="res_model">hr.employee.os</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree</field>
+    </record>
+
+    <menuitem id="menu_hr_employee_os" name="设置" parent="menu_hr_employee_approval" action="act_menu_hr_employee_os"/>
+
+    <record id="act_menu_hr_employee_1_1" model="ir.actions.act_window">
+      <field name="name">待审批</field>
+      <field name="res_model">hr.employee</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,kanban,form</field>
+      <field name="view_id" ref="view_hr_employee_state_tree"/>
+      <field name="context">{'search_default_state_draft': '1'}</field>
+    </record>
+
+    <record id="act_menu_hr_employee_1_2" model="ir.actions.act_window">
+      <field name="name">审批中</field>
+      <field name="res_model">hr.employee</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,kanban,form</field>
+      <field name="view_id" ref="view_hr_employee_state_tree"/>
+      <field name="context">{'search_default_state_underway': '1'}</field>
+    </record>
+
+    <record id="act_menu_hr_employee_1_3" model="ir.actions.act_window">
+      <field name="name">待到岗</field>
+      <field name="res_model">hr.employee</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,kanban,form</field>
+      <field name="view_id" ref="view_hr_employee_state_tree"/>
+      <field name="context">{'search_default_state_ready': '1'}</field>
+    </record>
+
+    <record id="act_menu_hr_employee_1_4" model="ir.actions.act_window">
+      <field name="name">入职测试</field>
+      <field name="res_model">hr.employee</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">form,tree,kanban</field>
+      <field name="context">{'search_default_state_exam': '1'}</field>
+    </record>
+
+    <record id="act_hr_smarty_employee_tree" model="ir.actions.act_window.view">
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_hr_employee_state_tree" />
+        <field name="act_window_id" ref="act_menu_hr_employee_1_4" />
+    </record>
+
+    <record id="act_hr_smarty_employee_form" model="ir.actions.act_window.view">
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_hr_smarty_employee_form" />
+        <field name="act_window_id" ref="act_menu_hr_employee_1_4" />
+    </record>
+
+    <menuitem id="menu_hr_1_1" name="待审批" parent="menu_hr_employee_approval" action="act_menu_hr_employee_1_1" sequence="1"/>
+    <menuitem id="menu_hr_1_2" name="审批中" parent="menu_hr_employee_approval" action="act_menu_hr_employee_1_2" sequence="2"/>
+    <menuitem id="menu_hr_1_3" name="待到岗" parent="menu_hr_employee_approval" action="act_menu_hr_employee_1_3" sequence="3"/>
+    <menuitem id="menu_hr_1_4" name="入职测试" parent="menu_hr_employee_approval" action="act_menu_hr_employee_1_4" sequence="4"/>
+<!-- 
+    <record id="act_menu_hr_employee_2_1" model="ir.actions.act_window">
+      <field name="name">离职中</field>
+      <field name="res_model">hr.employee</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,kanban,form</field>
+      <field name="view_id" ref="view_hr_employee_state_tree"/>
+      <field name="domain">[('state','=','draft')]</field>
+    </record>
+
+    <record id="act_menu_hr_employee_2_2" model="ir.actions.act_window">
+      <field name="name">已离职</field>
+      <field name="res_model">hr.employee</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,kanban,form</field>
+      <field name="view_id" ref="view_hr_employee_state_tree"/>
+      <field name="domain">[('state','=','underway')]</field>
+    </record>
+
+    <menuitem id="menu_hr_2_1" name="离职中" parent="menu_hr_2" action="act_menu_hr_employee_2_1"/>
+    <menuitem id="menu_hr_2_2" name="已离职" parent="menu_hr_2" action="act_menu_hr_employee_2_2"/>
+ -->
+  </data>
+</openerp>

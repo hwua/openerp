@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <act_window id="wizard_set_employment_state" 
+            name="设置就业状态"
+            src_model="res.partner"
+            res_model="employment.wizard"
+            view_type="form" view_mode="form"
+            key2="client_action_multi" target="new"/>
+
+        <record id="view_set_employment_state_wizard" model="ir.ui.view">
+            <field name="name">设置就业状态</field>
+            <field name="model">employment.wizard</field>
+            <field name="arch" type="xml">
+                <form string="设置就业状态">
+                    <group>
+                        <field name="name"/>
+                        <field name="employment_way" attrs="{'required':['|',('name','=','ne'),('name','=','he')],'invisible':[('name','!=','ne'),('name','!=','he')]}"/>
+                        <field name="employment_company" domain="[('res_company_type','=','res_company'),('customer','=',False)]" attrs="{'invisible':['|',('name','=','se'),('employment_way','=','se')]}" string="就业单位" placeholder="请搜索/选择"/>
+                        <field name="employment_custom_company" attrs="{'invisible':[('name','!=','se'),('employment_way','!=','se')]}" string="就业单位" placeholder="请如实填写"/>
+                        <field name="employment_show_company" attrs="{'invisible':1}"/>
+                    </group>
+                    <field name="jobs_ids">
+                        <tree editable="bottom">
+                            <field name="name" string='姓名'/>
+                            <field name="kehu_id"/>
+                            <field name="employment_state"/>
+                            <field name="employment_show_company"/>
+                        </tree>
+                    </field>
+                    <footer>
+                        <button string="确认" name="set_employment_state" type="object" class="btn-primary"/>
+                        <button string="取消" class="btn-default" special="cancel" />
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</openerp>

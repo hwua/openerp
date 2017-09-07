@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    <!-- 在订单中添加补助款跟踪 -->
+    <record id="invoice_sale_order_loan_grant_info" model="ir.ui.view">
+        <field name="name">sale.order.loan</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_view_invoice']" position="before">
+                <button name='change_already_number_by_a'
+                    type='object'
+                    string='财务'
+                    class="oe_stat_button"
+                    icon="fa-check-circle-o"
+                    groups="account.group_account_user"
+                    confirm="您确认此客户本期补贴已发放么？"
+                    attrs="{'invisible': ['|',('amount_grant_state','!=','in'),('amount_grant_confirm_b','=','no')]}">
+                    <field name='amount_grant_confirm_a' attrs="{'readonly':True}" style="color:red"/>
+                </button>
+                <button name='change_already_number_by_b'
+                    type='object'
+                    string='班主任'
+                    class="oe_stat_button"
+                    icon="fa-check-circle-o"
+                    groups="managercenter.group_managercenter_02"
+                    confirm="您需要向财务确认此客户本期补贴么？系统将会为本次补贴创建一张草稿付款单"
+                    attrs="{'invisible': ['|','|',('amount_grant_state','!=','in'),('amount_grant_state','!=','in'),('amount_grant_confirm_b','=','yes')]}">
+                    <field name='amount_grant_confirm_b' attrs="{'readonly':True}" style="color:red"/>
+                </button>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="补助款跟踪" attrs="{'invisible': [('amount_grant','=',0)]}">
+                    <group>
+                        <group>
+                            <field name='amount_grant_state'/>
+                            <field name='amount_grant_number'/>
+                            <field name='amount_grant_already_number'/>
+                            <field name='amount_grant_surplus_next'/>
+                            <field name='amount_grant_surplus_all'/>
+                            <label for='amount_grant_rate' class="oe_inline"/>
+                            <div>
+                                <field name='amount_grant_rate' class="oe_inline"/>%
+                            </div>
+                            <field name='amount_grant_confirm'/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</data>
+</openerp>

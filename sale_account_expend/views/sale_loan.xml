@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<!-- 销售订单新增贷款方案 -->
+		<record id="invoice_sale_order_loan" model="ir.ui.view">
+			<field name="name">sale.order.loan</field>
+			<field name="model">sale.order</field>
+			<field name="inherit_id" ref="sale.view_order_form"/>
+			<field name="arch" type="xml">
+				<field name="partner_id" position="after">
+					<field name="is_loan" attrs="{'readonly': [('state', 'in', ('sale', 'done', 'cancel'))]}"/>
+					<field name="company" attrs="{'invisible':[('is_loan', '=', False)],'required':[('is_loan', '=', True)],'readonly': [('state', 'in', ('sale', 'done', 'cancel'))]}" options="{'no_create_edit': 1}" />
+					<field name="company_project" domain="[('company_id', '=', company)]" attrs="{'invisible':[('company', '=', False)],'required':[('company', '!=', False)],'readonly': [('state', 'in', ('sale', 'done', 'cancel'))]}" options="{'no_create_edit': 1}" />
+					<field name="down_payment"  options='{"no_open": true}' class="oe_inline" attrs="{'invisible':['readonly': [('state', 'in', ('sale','done', 'cancel'))]}"/>
+					<field name="amount_grant" options='{"no_open": true}' attrs="{'invisible':[('company_project', '=', False)],'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"/>
+				</field>
+
+<!-- 				<xpath expr="//group[position()=1]/group[position()=2]" position="inside">
+	<group>
+		<label for="down_payment" class="oe_inline" attrs="{'invisible':[('company_project', '=', False)]}"/>
+		<div>
+			<field name="down_payment"  options='{"no_open": true}' class="oe_inline" attrs="{'invisible':[('company_project', '=', False)]}"/>
+			<button name="create_invoices_by_button" type="object" class="btn-primary" string="添加至产品"/>
+		</div>
+	</group>
+</xpath>
+ -->
+				<field name="amount_tax" position="after">
+					<field name="amount_down_payment" options='{"no_open": true}' attrs="{'invisible':[('amount_down_payment', '=', 0.0)]}"/>
+<!--					<field name="amount_grant"  options='{"no_open": true}' attrs="{'invisible':[('company_project', '=', False)],'readonly': [('state', 'in', ('sale', 'done', 'cancel'))]}"/>
+-->
+					<label for="amount_rate1" class="oe_inline" attrs="{'invisible':[('company_project', '=', False)]}"/>
+					<div  attrs="{'invisible':[('company_project', '=', False)]}">
+						<field name="amount_rate1" class="oe_inline" options='{"no_open": True}'/>%/月
+					</div>
+
+					<label for="amount_repayment_rate1" class="oe_inline" attrs="{'invisible':[('company_project', '=', False)]}"/>
+					<div  attrs="{'invisible':[('company_project', '=', False)]}">
+						<field name="amount_repayment_rate1" class="oe_inline" options='{"no_open": True}'/>
+					</div>
+
+					<label for="amount_rate2" class="oe_inline" attrs="{'invisible':[('company_project', '=', False)]}"/>
+					<div  attrs="{'invisible':[('company_project', '=', False)]}">
+						<field name="amount_rate2" class="oe_inline" options='{"no_open": True}'/>%/月
+					</div>
+
+					<label for="amount_repayment_rate2" class="oe_inline" attrs="{'invisible':[('company_project', '=', False)]}"/>
+					<div  attrs="{'invisible':[('company_project', '=', False)]}">
+						<field name="amount_repayment_rate2" class="oe_inline" options='{"no_open": True}'/>
+					</div>
+
+					<label for="amount_month1" class="oe_inline" attrs="{'invisible':[('company_project', '=', False)]}"/>
+					<div  attrs="{'invisible':[('company_project', '=', False)]}">
+						<field name="amount_month1" class="oe_inline" options='{"no_open": True}'/>期
+					</div>
+
+					<label for="amount_month2" class="oe_inline" attrs="{'invisible':[('company_project', '=', False)]}"/>
+					<div  attrs="{'invisible':[('company_project', '=', False)]}">
+						<field name="amount_month2" class="oe_inline" options='{"no_open": True}'/>期
+					</div>
+				</field>
+
+				<field name="amount_total" position="after">
+					<field name="amount_loan_total" class="oe_inline" attrs="{'invisible':[('company_project', '=', False)]}"/>
+					<field name="amount_installment1" class="oe_inline" attrs="{'invisible':[('company_project', '=', False)]}"/>
+					<field name="amount_installment2" class="oe_inline" attrs="{'invisible':[('company_project', '=', False)]}"/>
+				</field>
+
+<!-- 原有一对确认销售按钮，现在替换为两对，勾选贷款后，前一对确认销售按钮隐藏（所有人有效），而行政可见第二对（仅行政可见），达到行政审批贷款的效果 -->
+			<!-- <xpath expr="//button[@name='action_confirm'][last()-1]" position="replace">
+					<button name="action_confirm" string="确认销售" type="object"  class="btn-primary" context="{'show_sale': True}" attrs="{'invisible':['|',('state','not in',['sent']),('is_loan', '=', True)]}"/>
+					<button name="action_confirm" string="确认销售" type="object"  class="btn-primary" context="{'show_sale': True}" groups="assets.group_assets_02,base.group_sale_manager" attrs="{'invisible':['|',('state','not in',['sent']),('is_loan', '=', False)]}"/>
+				</xpath>
+				
+				<xpath expr="//button[@name='action_confirm'][last()]" position="replace">
+					<button name="action_confirm" string="确认销售" type="object" context="{'show_sale': True}" attrs="{'invisible':['|',('state','not in',['draft']),('is_loan', '=', True)]}"/>
+					<button name="action_confirm" string="确认销售" type="object" context="{'show_sale': True}" groups="assets.group_assets_02,base.group_sale_manager" attrs="{'invisible':['|',('state','not in',['draft']),('is_loan', '=', False)]}"/>
+				</xpath> -->
+			</field>
+		</record>
+
+		<!--<record id="view_order_tree2" model="ir.ui.view">
+			<field name="name">sale.order.tree</field>
+			<field name="model">sale.order</field>
+			<field name="inherit_id" ref="sale.view_order_tree"/>
+			<field name="priority">2</field>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='amount_total']" position="after">
+					<field name="is_loan"/>
+					<field name="amount_loan_total"/>
+				</xpath>
+			</field>
+		</record>-->
+
+		<!--<record id="view_quotation_tree2" model="ir.ui.view">
+			<field name="name">sale.order.tree</field>
+			<field name="model">sale.order</field>
+			<field name="inherit_id" ref="sale.view_quotation_tree"/>
+			<field name="priority">4</field>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='amount_total']" position="after">
+					<field name="is_loan"/>
+					<field name="amount_loan_total"/>
+				</xpath>
+			</field>
+		</record>-->
+
+
+<!-- 行政仅可见贷款订单，为行政新增菜单和视图 -->
+<!-- 
+		<record id="action_quotations2" model="ir.actions.act_window">
+			<field name="name">贷款审批-报价单</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="groups" eval="[(4,ref('assets.group_assets_02'))]"/>
+			<field name="res_model">sale.order</field>
+			<field name="view_type">form</field>
+			<field name="view_id" ref="sale.view_quotation_tree"/>
+			<field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+			<field name="context">{}</field>
+			<field name="domain">[('state','in',('draft','sent','cancel')),('is_loan','=',True)]</field>
+			<field name="search_view_id" ref="sale.view_sales_order_filter"/>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">
+					Create a Quotation, the first step of a new sale.
+				</p><p>
+				Your next actions should flow efficiently: confirm the Quotation 
+				to a Sale Order, then create the Invoice and collect the Payment.
+				</p><p>
+				Note that once a Quotation becomes a Sale Order, it will be moved 
+				from the Quotations list to the Sales Order list.
+				</p>
+			</field>
+		</record>
+
+		<menuitem id="menu_sale_quotations2" action="action_quotations2" parent="base.menu_sales" sequence="11" groups="assets.group_assets_02,base.group_sale_manager"/>
+
+		<record id="action_orders2" model="ir.actions.act_window">
+			<field name="name">贷款审批-销售订单</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="groups" eval="[(4,ref('assets.group_assets_02'))]"/>
+			<field name="res_model">sale.order</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,kanban,form,calendar,pivot,graph</field>
+			<field name="search_view_id" ref="sale.view_sales_order_filter"/>
+			<field name="context">{'show_sale': True}</field>
+			<field name="domain">[('state', 'not in', ('draft', 'sent', 'cancel')),('is_loan','=',True)]</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">
+					Create a Quotation, the first step of a new sale.
+				</p><p>
+				Your next actions should flow efficiently: confirm the Quotation to a Sale Order, then create the Invoice and collect the Payment.
+				</p><p>
+				Note that once a Quotation becomes a Sale Order, it will be moved from the Quotations list to the Sales Order list.
+				</p>
+			</field>
+		</record>
+
+		<menuitem action="action_orders2" id="menu_sale_order2" parent="base.menu_sales" sequence="12" groups="assets.group_assets_02,base.group_sale_manager"/> -->
+
+	</data>
+</openerp>

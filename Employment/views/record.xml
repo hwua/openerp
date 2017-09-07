@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    <record id="view_employment_interview_record_tree" model="ir.ui.view">
+      <field name="name">view.employment_interview_record.tree</field>
+      <field name="model">interview_record</field>
+      <field name="arch" type="xml">
+        <tree editable="bottom">
+            <field name="time"/>
+            <field name="record"/>
+        </tree>
+      </field>
+    </record>
+  </data>
+</openerp>

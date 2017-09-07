@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+    <!-- 定义招聘需求表单视图 -->
+    <record id="view_recruitment_information_from_employee" model="ir.ui.view">
+      <field name="name">view.recruitment.information.from.employee</field>
+      <field name="model">recruitment.information</field>
+      <field name="inherit_id" ref="Recruitment.view_recruitment_information_from"/>
+      <field name="arch" type="xml">
+
+        <sheet position="before">
+          <header>
+            <button name="create_new_employee" type="object" string="建立员工" class="btn-primary oe_read_only" help="为此条招聘建立员工，可以依次进入入职流程"/>
+          </header>
+        </sheet>
+
+        <xpath expr="//field[@name='name']/.." position="inside">
+          <field name="employee_id"/>
+        </xpath>
+
+      </field>
+    </record>
+
+    <record id="view_employee_quick_form" model="ir.ui.view">
+      <field name="name">view.employee.quick.form</field>
+      <field name="model">hr.employee</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <group>
+              <field class="oe_avatar" name="image" widget="image"/>
+              <field name="name" required="1"/>
+              <field name="department_id" required="1"/>
+              <field name="parent_id" required="1"/>
+              <field name="coach_id" required="1"/>
+              <field name="hr_worktime_from" required="1"/>
+              <field name="company_id" required="1"/>
+              <field name="create_mail" invisible="1"/>
+            </group>
+          </sheet>
+          <footer>
+            <button string="保存" name="action_save" type="object" class="btn-primary" confirm="将在入职中建立一个用户开始入职"/>
+            <button string="删除" name="action_reset" type="object"  attrs="{'invisible':[('name','=',False)]}" class="btn-default" confirm="此预定义员工将在入职中被删除,您可以再新建一个"/>
+            <button string="取消" class="btn-default" special="cancel"/>
+          </footer>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_hr_employee_set_approval_confirm_form" model="ir.ui.view">
+      <field name="name">view.hr.employee.set.approval.confirm.form</field>
+      <field name="model">hr.employee.set.approval.confirm</field>
+      <field name="arch" type="xml">
+        <form>
+
+          <sheet>
+            <group>
+              <field name="company_id"/>
+              <field name="first_name" placeholder="英文名"/>
+              <field name="last_name" placeholder="中文姓拼音"/>
+            </group>
+            <group>
+              <field name="account" attrs="{'invisible':['|','|',('company_id','=',False),('first_name','=',False),('last_name','=',False)]}"/>
+              <field name="domainName" attrs="{'invisible':['|','|',('company_id','=',False),('first_name','=',False),('last_name','=',False)]}"/>
+              <field name="mail" attrs="{'invisible':['|','|',('company_id','=',False),('first_name','=',False),('last_name','=',False)]}"/>
+              <field name="password" attrs="{'invisible':['|','|',('company_id','=',False),('first_name','=',False),('last_name','=',False)]}" placeholder="包含大写字母、数字、标点符号，比如Oaec.2017"/>
+            </group>
+          </sheet>
+
+          <footer>
+            <button string="账号建立" name="action_save" class="btn-primary" type="object" attrs="{'invisible':['|',('first_name','=',False),('last_name','=',False)]}"/>
+            <button string="取消" class="btn-default" special="cancel"/>
+          </footer>
+
+        </form>
+      </field>
+    </record>
+
+    <record id="act_hr_employee_set_approval_confirm" model="ir.actions.act_window">
+        <field name="name">填写账号信息</field>
+        <field name="res_model">hr.employee.set.approval.confirm</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+    </record>
+
+    <record id="view_recruitment_survey_notice_form" model="ir.ui.view">
+      <field name="name">view.recruitment.survey.notice.form</field>
+      <field name="model">recruitment.survey.notice</field>
+      <field name="arch" type="xml">
+        <form>
+
+          <sheet>
+            <group>
+              <field name="subject"/>
+              <field name="mail_to" domain="[('state', '=', 'exam')]" options="{'no_create_edit': '1'}"/>
+              <field name="other_mail_to" domain="[('state', '=', 'exam')]" options="{'no_create_edit': '1'}" widget="email" placeholder="如果需要额外邮箱提醒收件人，请填写"/>
+              <field name="body"/>
+            </group>
+          </sheet>
+
+          <footer>
+            <button string="发送" name="notice_mail" class="btn-primary" type="object"/>
+            <button string="取消" class="btn-default" special="cancel"/>
+          </footer>
+
+        </form>
+      </field>
+    </record>
+
+    <record id="act_recruitment_survey_notice" model="ir.actions.act_window">
+        <field name="name">测试提醒</field>
+        <field name="res_model">recruitment.survey.notice</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+    </record>
+
+  </data>
+</openerp>

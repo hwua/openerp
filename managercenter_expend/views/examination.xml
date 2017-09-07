@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    <!-- 更新考试信息的动作 -->
+    <record forcecreate="True"  id="ir_cron_update_examination_action" model="ir.cron">
+            <field name="name">更新考试信息</field>
+            <field eval="'examination.information'" name="model"/>
+            <field eval="'update_examination'" name="function"/>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field eval="True" name="doall"/>
+            <field eval="'(True,)'" name="args"/>
+            <field eval="True" name="active"/>
+        </record>
+
+          <!-- 定义考试动作 -->
+        <record id="examination_information_action"  model="ir.actions.act_window">
+            <field name="name">考试管理</field>
+            <field name="res_model">examination.information</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+       <!-- 定义考试搜索视图 -->
+        <record id="view_examination_information_search" model="ir.ui.view">
+        <field name="name">view.examination.information.search</field>
+        <field name="model">examination.information</field>
+        <field name="arch" type="xml"> 
+          <search> 
+            <field name="name"/>
+            <field name="papername"/>
+            <field name="sid"/>
+            <group expand="0" string="Group By">
+              <filter string="课程名称" domain="[]" context="{'group_by':'papername'}"/>
+              <filter string="出卷人" domain="[]" context="{'group_by':'user'}"/>
+              <filter string="地区" domain="[]" context="{'group_by':'location'}"/>
+              <filter string="课程" domain="[]" context="{'group_by':'sid'}"/>
+            </group>
+          </search>
+        </field>
+      </record>
+
+      <!-- 定义考试tree视图 -->
+        <record id="view_examination_information_tree" model="ir.ui.view">
+            <field name="name">view.examination.information.tree</field>
+            <field name="model">examination.information</field>            
+            <field name="arch" type="xml">
+                <tree create="false"  >
+                        <field name="papername"/>
+                        <field name="title"/>
+                        <field name="Examinationinformation_id"/>
+                        <field name="location"/>     
+                        <field name="user"/>                 
+                        <field name="averg_score"/> 
+                        <field name="post_student"/>                      
+                        <field name="total_student"/>
+                        <field name="sid"/>
+                </tree>    
+            </field>
+        </record>
+      <!-- 定义考试form视图 -->
+         <record id="view_examination_information_form" model="ir.ui.view">
+            <field name="name">view.examination.information.form</field>
+            <field name="model">examination.information</field>
+            <field name="arch" type="xml">
+                <form create="false" edit="false">
+                      <group>
+                        <field name="name"  invisible="1"/>
+                        <field name="paperid" invisible="1"/>
+                        <field name="papername"/>
+                        <field name="title"/>
+                        <field name="Examinationinformation_id"/>
+                         <field name="user"/>
+                         <field name="location"/>     
+                         <field name="teacher"/>                 
+                        <field name="averg_score"/>
+                        <field name="post_student"/>
+                        <field name="total_student"/>
+                        <field name="sid"/>
+                        <field name="url_student"/>
+                        <field name="url_view"/>
+                        <field name="url_preview"/>
+                        <field name="url_detail"/>
+                      </group>
+                </form>  
+            </field>
+        </record>   
+    </data>
+</openerp>

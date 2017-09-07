@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+	<data>
+		<record id="view_classto_mail_template" model="ir.actions.act_window">
+			<field name="name">邮件模板</field>
+			<field name="res_model">classto.email.template</field>
+			<field name="type">ir.actions.act_window</field>
+			<field name="view_type">form</field>
+			<field name="view_mode">tree,form</field>
+		</record>
+
+		<menuitem id="view_classto_mail_template_config" name="邮件设置" parent="managercenter.menu_top_student"/>
+		<menuitem id="view_classto_mail_templates" name="邮件模板" parent="view_classto_mail_template_config" action="view_classto_mail_template"/>
+
+		<record id="view_classto_mail_template_tree" model="ir.ui.view">
+			<field name="name">列表</field>
+			<field name="model">classto.email.template</field>
+			<field name="arch" type="xml">
+				<tree>
+					<field name="name"/>
+				</tree>
+			</field>
+		</record>
+
+		<record id="view_classto_mail_template_form" model="ir.ui.view">
+			<field name="name">详情</field>
+			<field name="model">classto.email.template</field>
+			<field name="arch" type="xml">
+				<form>
+					<sheet>
+						<group>
+							<field name="name"/>
+						</group>
+						<group>
+							<field name="mode"/>
+						</group>
+						<group>
+							<field name="email_from"/>
+						</group>
+						<field name="body_editor"/>
+						<field name="body_text" attrs="{'invisible':[('mode', '==', False)]}"/>
+					</sheet>
+				</form>
+			</field>
+		</record>
+
+	</data>
+</openerp>

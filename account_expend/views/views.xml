@@ -1,0 +1,164 @@
+<openerp>
+  <data>
+
+    <record id="sale_quick_invoice_button" model="ir.ui.view">
+      <field name="name">sale.quick.invoice.button</field>
+      <field name="model">sale.order</field>
+      <field name="inherit_id" ref="sale.view_order_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//field[@name='invoice_count']/.." position="replace">
+          <button name="action_sale_quick_invoice_confirm" type="object" class="oe_stat_button" icon="fa-pencil-square-o"  groups="account.group_account_invoice" attrs="{'invisible': [('state', 'not in', ['sale','done'])]}">
+            <field name="invoice_count" string="收款" widget="statinfo" modifiers="{'readonly': true}"/>
+          </button>
+        </xpath>
+      </field>
+    </record>
+
+    <record id="invoice_account_invoice_add_entity_info" model="ir.ui.view">
+      <field name="name">account.invoice.add.entity.info</field>
+      <field name="model">account.invoice</field>
+      <field name="inherit_id" ref="account.invoice_form"/>
+      <field name="arch" type="xml">
+        <field name="date_invoice" position="before">
+          <field name="invoice_number" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
+        </field>
+      </field>
+    </record>
+
+
+
+
+    <record id="view_sale_invoice_confirm_from" model="ir.ui.view">
+      <field name="name">收款管理</field>
+      <field name="model">quick.invoice.confirm</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <p class="oe_grey">
+              当订单含有优惠，优惠将独立为一次收款，收款结果将会是一次减款。
+              针对价格优惠的操作，均将转化为正数
+              一行收款不代表一张收据，收据号可重复填写。
+              建立收款后，收款将无法删除，如果收据号写错，在登记收款时可以做最后一次修改。
+              如果本界面内容出现偏差，请尝试刷新。
+            </p>
+            <sheet>
+              <field name="sale_order_id" invisible="1"/>
+              <group>
+                <group class="oe_inline">
+                  <field name="sale_quick_invoice_lines" nolabel="1"/>
+                </group>
+                <group class="oe_inline">
+                  <field name='show' nolabel="1"/>
+                </group>
+              </group>
+            </sheet>
+            <sheet>
+              <field name="account_quick_invoices" nolabel="1"/>
+            </sheet>
+          </sheet>
+          <footer>
+            <button name="del_the_confirm" type="object" class="btn-primary" string="刷新" groups="account.group_account_invoice"/>
+          </footer>
+        </form>
+      </field>
+    </record>
+
+    <record id="act_sale_invoice_confirm" model="ir.actions.act_window">
+      <field name="name">收款管理</field>
+      <field name="res_model">quick.invoice.confirm</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">form</field>
+    </record>
+
+
+
+
+    <record id="view_sale_quick_invoice_confirm_line_tree" model="ir.ui.view">
+      <field name="name">收款管理</field>
+      <field name="model">sale.quick.invoice.confirm.line</field>
+      <field name="arch" type="xml">
+        <tree created="false" colors="grey:identification in ('down_payment')">
+          <field name="product_id"/>
+          <field name="sale_order_line" invisible="1"/>
+          <field name="price_total"/>
+          <field name="balance" invisible="1"/>
+          <field name="qty_invoiced" widget="Integer"/>
+          <field name="identification"/>
+          <button name="create_new_invoice" type="object" string="建立收款" groups="account.group_account_invoice" attrs="{'invisible': ['|',('identification', 'in', ['down_payment']),('balance','=',0.0)]}"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_sale_quick_invoice_confirm_line_from" model="ir.ui.view">
+      <field name="name">收款管理</field>
+      <field name="model">sale.quick.invoice.confirm.line</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <group>
+              <field name="product_id"/>
+              <field name="sale_order_line" invisible="1"/>
+              <field name="amount"/>
+              <field name="balance"/>
+              <field name="comment"/>
+              <field name="invoice_number"/>
+              <field name="date_invoice"/>
+            </group>
+          </sheet>
+          <footer>
+            <button name="create_invoice" string="建立收款" type="object" class="btn-primary oe_edit_only" groups="account.group_account_invoice"/>
+            <button string="返回" class="btn-default oe_edit_only" name="confirm_cancel" type="object"/>
+          </footer>
+        </form>
+      </field>
+    </record>
+
+    <record id="act_sale_quick_invoice_confirm" model="ir.actions.act_window">
+      <field name="name">收款管理</field>
+      <field name="res_model">sale.quick.invoice.confirm.line</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">form</field>
+    </record>
+
+
+
+
+
+    <record id="view_account_quick_invoice_confirm_line_tree" model="ir.ui.view">
+      <field name="name">收款管理</field>
+      <field name="model">account.quick.invoice.confirm.line</field>
+      <field name="arch" type="xml">
+        <tree created="false" editable="bottom" colors="green:state in ('paid'),red:state in ('open'),grey:state in ('cancel')">
+          <field name="invoice_line_ids"/>
+          <field name="invoice_id" invisible="1"/>
+          <field name="total"/>
+          <field name="cdate"/>
+          <field name="invoice_number" attrs="{'readonly': [('state', 'in', ['paid','cancel'])]}"/>
+          <field name="date_invoice" attrs="{'readonly': [('state', 'in', ['paid','cancel'])]}"/>
+          <field name="state" invisible="1"/>
+          <button name="action_invoice" type="object" string='登记收款' groups="account.group_account_invoice" attrs="{'invisible': [('state', 'in', ['paid','cancel'])]}"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="act_account_quick_invoice_confirm" model="ir.actions.act_window">
+      <field name="name">收款管理</field>
+      <field name="res_model">account.quick.invoice.confirm.line</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">form</field>
+    </record>
+
+    <record id="view_sales_order_filter_account_order" model="ir.ui.view">
+      <field name="name">view.sales.order.filter.account.order</field>
+      <field name="model">sale.order</field>
+      <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+      <field name="arch" type="xml">
+        <xpath expr="//search" position="inside">
+          <field name='account_invoices_date' string='开票年月（列如2017-8）' filter_domain="[('account_invoices_date','ilike',self)]"/>
+          <!-- <field name='account_invoices_date' string='开票日期（结束）' filter_domain="[('account_invoices_date_end','ilike',self)]"/> -->
+        </xpath>
+      </field>
+    </record>
+
+  </data>
+</openerp>

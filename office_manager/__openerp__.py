@@ -3,10 +3,12 @@
     'name': "Office Manager",
 
     'summary': """
+        建立新员工，入职建立邮箱账号，开通加密
+        离职员工，归档res_user，hr_employee，删除邮箱与加密
         """,
 
     'description': """
-        入职管理
+        入职离职
     """,
 
     'author': "Winton.he",
@@ -24,12 +26,11 @@
     'Recruitment',
     ],
     'data': [
-     'views/department.xml',
      'views/approvers.xml',
      'views/employee.xml',
      'views/menus.xml',
-     'views/library_view.xml',
-     'views/recruitment.xml'
+     'views/recruitment.xml',
+     'views/template.xml'
     ],
     'demo': [
         # 'demo/demo.xml',

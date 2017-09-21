@@ -1,17 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <openerp>
   <data>
+
     <record id="view_hr_employee_approvers_state_tree" model="ir.ui.view">
       <field name="name">审批人</field>
       <field name="model">hr.employee.approvers</field>
       <field name="arch" type="xml">
         <tree editable="bottom">
           <field name="approver"/>
-          <field name="name"/>
-          <field name="department"/>
-          <field name="state"/>
+          <field name="name" readonly='1'/>
+          <field name="department" readonly='1'/>
+          <field name="post"/>
+          <field name="state" readonly='1'/>
         </tree>
       </field>
     </record>
+
+    <record id="view_hr_department_form" model="ir.ui.view">
+      <field name="name">view.hr_department.form</field>
+      <field name="model">hr.department</field>
+      <field name="inherit_id" ref="hr.view_department_form"/>
+      <field name="arch" type="xml">
+        <field name="company_id" position="after">
+          <field name="series"/>
+          <field name="os_department_id"/>
+        </field>
+      </field>
+    </record>
+
+    <record id="view_hr_employee_leaving_confirm_form" model="ir.ui.view">
+      <field name="name">view.hr.employee.leaving.confirm.form</field>
+      <field name="model">hr.employee.leaving.confirm</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <label for="administrative"/>
+            <field name="administrative" nolabel="1" domain="[('active', '=', True),('state','=',False)]" options="{'no_create_edit':1,'no_open':1,'no_quick_create':1}"/>
+            <p class="oe_grey">
+              行政负责确认离职人员的固定资产，回收公司资产
+            </p>
+            <label for="information"/>
+            <field name="information" nolabel="1" domain="[('active', '=', True),('state','=',False)]" options="{'no_create_edit':1,'no_open':1,'no_quick_create':1}"/>
+            <p class="oe_grey">
+              IT负责离职人员相关信息安全，移除员工SIP
+            </p>
+            <label for="personnel"/>
+            <field name="personnel" nolabel="1" domain="[('active', '=', True),('state','=',False)]" options="{'no_create_edit':1,'no_open':1,'no_quick_create':1}"/>
+            <p class="oe_grey">
+              人事发送离职报告，关闭账号
+            </p>
+          </sheet>
+          <footer>
+            <button name="confirm" type="object" class="btn-primary" string="确认"/>
+            <button class="btn-default" special="cancel" string="取消"/>
+          </footer>
+        </form>
+      </field>
+    </record>
+
   </data>
 </openerp>

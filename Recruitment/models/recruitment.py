@@ -200,15 +200,15 @@ class RecruitmentInformation(models.Model):
 							recruitment_information.send_recruitment_email(recruitment_information.zhipaiuser.work_email,recruitment_information.shenqingresuser.email)
 							recruitment_information.send_recruitment_email(recruitment_information.zhipaiuser.work_email,recruitment_information.HRmanage.work_email)
 	
-	@api.constrains('shenqingdepartment_id')
-	def update_test(self, cr, uid, ids,context=None):
-		hr_department_model = self.pool.get('hr.department')
-		hr_department = hr_department_model.search(cr, uid, [('id', '!=', False)])
-		lst = []
-		for per in hr_department:
-			hr_department_ids = hr_department_model.browse(cr, uid, per)
-			lst.append(hr_department_ids.manager_id.user_id.id)
-		if uid not in lst:
-			raise ValidationError("只有部门主管有创建权限！")
+	# @api.constrains('shenqingdepartment_id')
+	# def update_test(self, cr, uid, ids,context=None):
+		# hr_department_model = self.pool.get('hr.department')
+		# hr_department = hr_department_model.search(cr, uid, [('id', '!=', False)])
+		# lst = []
+		# for per in hr_department:
+			# hr_department_ids = hr_department_model.browse(cr, uid, per)
+			# lst.append(hr_department_ids.manager_id.user_id.id)
+		# if uid not in lst:
+			# raise ValidationError("只有部门主管有创建权限！")
 
 

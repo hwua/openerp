@@ -61,6 +61,7 @@
               <field name="last_name" placeholder="中文姓拼音"/>
             </group>
             <group>
+              <field name="hr_number" attrs="{'invisible':['|','|',('company_id','=',False),('first_name','=',False),('last_name','=',False)]}"/>
               <field name="account" attrs="{'invisible':['|','|',('company_id','=',False),('first_name','=',False),('last_name','=',False)]}"/>
               <field name="domainName" attrs="{'invisible':['|','|',('company_id','=',False),('first_name','=',False),('last_name','=',False)]}"/>
               <field name="mail" attrs="{'invisible':['|','|',('company_id','=',False),('first_name','=',False),('last_name','=',False)]}"/>

@@ -7,10 +7,12 @@
       <field name="inherit_id" ref="hr.view_employee_filter"/>
       <field name="arch" type="xml">
         <xpath expr="//field[@name='department_id']/.." position="inside">
-          <filter name="state_draft" string="待审批" domain="[('state', '=', 'draft'),('active','=',False)]"/>
-          <filter name="state_underway" string="审批中" domain="[('state', '=', 'underway'),('active','=',False)]"/>
-          <filter name="state_ready" string="待到岗" domain="[('state', '=', 'ready'),('active','=',False)]"/>
-          <filter name="state_exam" string="入职测试" domain="[('state', '=', 'exam')]"/>
+          <filter name="state_draft" string="待审批" domain="['|',('active','=',False),('active','=',True),('state', '=', 'draft')]"/>
+          <filter name="state_underway" string="审批中" domain="['|',('active','=',False),('active','=',True),('state', '=', 'underway')]"/>
+          <filter name="state_ready" string="待到岗" domain="['|',('active','=',False),('active','=',True),('state', '=', 'ready')]"/>
+          <filter name="state_exam" string="入职测试" domain="['|',('active','=',False),('active','=',True),('state', '=', 'exam')]"/>
+          <filter name="state_leaving" string="离职中" domain="['|',('active','=',False),('active','=',True),('state', '=', 'leaving')]"/>
+          <filter name="state_left" string="已离职" domain="['|',('active','=',False),('active','=',True),('state', '=', 'left')]"/>
         </xpath>
       </field>
     </record>
@@ -33,7 +35,7 @@
         </tree>
       </field>
     </record>
-    
+
     <record id="view_update_hr_employee_form" model="ir.ui.view">
       <field name="name">update_hr_user_form</field>
       <field name="model">hr.employee</field>
@@ -44,9 +46,9 @@
             <button name="want_approval" type="object" string="建立账号" class="btn-primary oe_read_only" attrs="{'invisible':['|',('department_id','=',False), ('state','!=','ready')]}"  confirm="接下来的操作将为员工建立账号，请确保员工信息已填写完善"/>
             <button name="start_approval" type="object" string="开始入职" class="btn-primary oe_read_only" attrs="{'invisible':['|','|',('department_id','=',False), ('state','=','ready'), ('state','!=','draft')]}" confirm="您确认此员工进入入职流程？请确保OS与ERP权限已设置"/>
             <button name="pass_approval" type="object" string="直接通过" class="oe_read_only" attrs="{'invisible':['|','|',('department_id','=',False), ('state','=','ready'), ('state','!=','draft')]}" confirm="请注意，此操作将跳过入职审批,直接完成入职" help="可直接跳过审批，完成入职"/>
-            <!-- <button name="set_pass" type="object" string="通过" class="btn-primary oe_read_only" attrs="{'invisible':[('state', '!=', 'underway')]}" confirm="您确认要审批通过？"/> -->
-            <!-- <button name="start_leaving" type="object" string="开始离职" class="oe_read_only" attrs="{'invisible':[('state', '!=', False)]}" confirm="您确认此员工开始离职流程？"/> -->
-            <field name="state" widget="statusbar" attrs="{'invisible':[('state','=',False)]}" clickable="True"/>
+            <button name="start_leaving" type="object" string="开始离职" class="oe_read_only" attrs="{'invisible':[('state', 'in', ['draft','underway','ready','leaving','left'])]}"/>
+            <button name="close_account" type="object" string="关闭账号" class="btn-primary oe_read_only close_account" invisible='1' confirm="请确认审批人已经全部通过"/>
+            <field name="state" widget="statusbar" statusbar_visible="exam,done,leaving"/>
           </header>
         </sheet>
 
@@ -57,6 +59,10 @@
         <xpath expr="//field[@name='has_badges']/.." position="attributes">
           <attribute name="attrs">{'invisible':[('state','in',['draft','underway'])]}</attribute>
         </xpath>
+
+        <field name="hr_number" position="attributes">
+          <attribute name="attrs">{'readonly':'1','required':False}</attribute>
+        </field>
 
         <!-- user_id为只读，防止联系到现有的账号 -->
         <field name="user_id" position="attributes">
@@ -85,9 +91,14 @@
               </group>
             </button>
           </page>
-          <page string="入职审批" attrs="{'invisible':[('state','=',False)]}">
-            <!-- <label for="notify_person"/>
-            <field name="notify_person"/> -->
+          <page string="入职审批" attrs="{'invisible':[('state','not in',['draft','underway','ready','exam'])]}">
+            <field name="approvers_line"/>
+          </page>
+          <page string="离职审批" attrs="{'invisible':[('state','not in',['leaving','left'])]}">
+            <p class="oe_grey">
+              审批人有上级、行政、IT、人事。人事链接进入ERP，手动关闭员工账号，其余审批人通过审批，
+              其中人事如果有任何变动，请在审批人中修改人事，新人事就可以继续此员工离职流程
+            </p>
             <field name="approvers_line"/>
           </page>
         </xpath>
@@ -104,7 +115,7 @@
         </tree>
       </field>
     </record>
-    
+
     <!-- 入职测试员工的精简试图 -->
     <record id="view_hr_smarty_employee_form" model="ir.ui.view">
       <field name="name">view.hr_smarty_employee.form</field>
@@ -112,7 +123,8 @@
       <field name="arch" type="xml">
         <form string="员工">
           <header>
-            <field name="state" widget="statusbar" attrs="{'invisible':[('state','=',False)]}"/>
+            <button name="start_leaving" type="object" string="开始离职" class="oe_read_only" attrs="{'invisible':[('state', 'in', ['draft','underway','ready','leaving','left'])]}"/>
+            <field name="state" widget="statusbar" statusbar_visible="exam,done,leaving" clickable="True"/>
           </header>
           <sheet>
             <div class="oe_button_box" name="button_box" attrs="{'invisible':[('state','in',['draft','underway','ready'])]}" modifiers="{'invisible': [['state', 'in', ['draft', 'underway', 'ready']]]}">

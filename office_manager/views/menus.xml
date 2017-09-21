@@ -46,7 +46,7 @@
       <field name="name">入职测试</field>
       <field name="res_model">hr.employee</field>
       <field name="view_type">form</field>
-      <field name="view_mode">form,tree,kanban</field>
+      <field name="view_mode">tree,kanban,form</field>
       <field name="context">{'search_default_state_exam': '1'}</field>
     </record>
 
@@ -62,18 +62,13 @@
         <field name="act_window_id" ref="act_menu_hr_employee_1_4" />
     </record>
 
-    <menuitem id="menu_hr_1_1" name="待审批" parent="menu_hr_employee_approval" action="act_menu_hr_employee_1_1" sequence="1"/>
-    <menuitem id="menu_hr_1_2" name="审批中" parent="menu_hr_employee_approval" action="act_menu_hr_employee_1_2" sequence="2"/>
-    <menuitem id="menu_hr_1_3" name="待到岗" parent="menu_hr_employee_approval" action="act_menu_hr_employee_1_3" sequence="3"/>
-    <menuitem id="menu_hr_1_4" name="入职测试" parent="menu_hr_employee_approval" action="act_menu_hr_employee_1_4" sequence="4"/>
-<!-- 
     <record id="act_menu_hr_employee_2_1" model="ir.actions.act_window">
       <field name="name">离职中</field>
       <field name="res_model">hr.employee</field>
       <field name="view_type">form</field>
       <field name="view_mode">tree,kanban,form</field>
       <field name="view_id" ref="view_hr_employee_state_tree"/>
-      <field name="domain">[('state','=','draft')]</field>
+      <field name="context">{'search_default_state_leaving': '1'}</field>
     </record>
 
     <record id="act_menu_hr_employee_2_2" model="ir.actions.act_window">
@@ -82,11 +77,15 @@
       <field name="view_type">form</field>
       <field name="view_mode">tree,kanban,form</field>
       <field name="view_id" ref="view_hr_employee_state_tree"/>
-      <field name="domain">[('state','=','underway')]</field>
+      <field name="context">{'search_default_state_left': '1'}</field>
     </record>
 
-    <menuitem id="menu_hr_2_1" name="离职中" parent="menu_hr_2" action="act_menu_hr_employee_2_1"/>
-    <menuitem id="menu_hr_2_2" name="已离职" parent="menu_hr_2" action="act_menu_hr_employee_2_2"/>
- -->
+    <menuitem id="menu_hr_1_1" name="待审批" parent="menu_hr_employee_approval" action="act_menu_hr_employee_1_1" sequence="1"/>
+    <menuitem id="menu_hr_1_2" name="审批中" parent="menu_hr_employee_approval" action="act_menu_hr_employee_1_2" sequence="2"/>
+    <menuitem id="menu_hr_1_3" name="待到岗" parent="menu_hr_employee_approval" action="act_menu_hr_employee_1_3" sequence="3"/>
+    <menuitem id="menu_hr_1_4" name="入职测试" parent="menu_hr_employee_approval" action="act_menu_hr_employee_1_4" sequence="4"/>
+    <menuitem id="menu_hr_2_1" name="离职中" parent="menu_hr_employee_approval" action="act_menu_hr_employee_2_1" sequence="5"/>
+    <menuitem id="menu_hr_2_2" name="已离职" parent="menu_hr_employee_approval" action="act_menu_hr_employee_2_2" sequence="6"/>
+
   </data>
 </openerp>

@@ -27,11 +27,12 @@ class set_approval(models.TransientModel):
     mail = fields.Char(string="邮箱", required=True)
     password = fields.Char(string="密码", required=True)
     company_id = fields.Many2one('res.company', string="公司", required=True)
+    hr_number = fields.Char(string="员工编号", required=True)
 
-    @api.multi
     # 检查邮箱地址存在
+    @api.multi
     def check_email(self):
-        url="httpshttpshttpshttps%s" % (self.mail.encode('ascii'))
+        url = "https:######################"
         cbuffer = cStringIO.StringIO()
         curl = pycurl.Curl()
         # 忽略证书
@@ -46,6 +47,7 @@ class set_approval(models.TransientModel):
             return 'success'
         return 'failed'
 
+    # 生成字母和数字组合随机密码
     def get_password(self):
         passwd = []
         while (len(passwd) < 9):
@@ -56,6 +58,13 @@ class set_approval(models.TransientModel):
             elif len(passwd) < 9:
                 passwd.append(choice(string.digits))
         return ''.join(passwd)
+    
+    # 获取最大员工编号+1
+    def get_hr_number(self):
+        self.env.cr.execute("select MAX(hr_number) from hr_employee where hr_number ILIKE 'OAEC%'")
+        result = self.env.cr.fetchone()
+        number = re.findall(r'\d+',result[0])
+        return 'OAEC%s' % str(int(number[0])+1)
 
     # 拼接邮箱
     @api.onchange('first_name','last_name','company_id')
@@ -81,19 +90,18 @@ class set_approval(models.TransientModel):
                     'account': account,
                     'domainName': domainName,
                     'mail': mail,
-                    'password': self.get_password()
+                    'password': self.get_password(),
+                    'hr_number': self.get_hr_number()
                     })
 
     # 建立本地账号
     @api.multi
     def new_user(self):
-        open_user = self.env['res.users'].search([('login','=',self.mail)])
-        close_user = self.env['res.users'].search([('login','=',self.mail),('active','=',False)])
-        if open_user:
+        erp_user = self.env['res.users'].search(['|',('active','=',False),('active','=',True),('login','=',self.mail)])
+        if erp_user:
+            if erp_user.active == False:
+                erp_user.active = True
             return open_user[0].id
-        elif close_user:
-            close_user.active = True
-            return close_user[0].id
         else:
             user_info = {
                 'name': self.first_name + ' ' + self.last_name,
@@ -126,7 +134,7 @@ class set_approval(models.TransientModel):
             'sign': sign
         }
 
-        url = "httpshttpshttpshttpshttps"
+        url = "https:######################"
 
         cbuffer = cStringIO.StringIO()
         curl = pycurl.Curl()
@@ -147,33 +155,53 @@ class set_approval(models.TransientModel):
     @api.multi
     def new_email_completion(self):
         searchFilter = "mail=%s" % (self.mail)
-        memberOfGroup = []
-        for conf in self.company_id.ldaps:#遍历账号所属公司ldap配置，向LDAP修改objectClass、中文名、OS权限、
-            con = self.env['hr.employee'].connect(conf)
-            con.protocal_version = ldap.VERSION3
+        employee = self.env['hr.employee'].browse(self._context.get('active_id',False))
+        if employee:
+            memberOfGroup = []
+            for conf in self.company_id.ldaps:#遍历账号所属公司ldap配置，向LDAP修改objectClass、中文名、OS权限、
+                con = self.env['hr.employee'].connect(conf)
+                con.protocal_version = ldap.VERSION3
 
-            regex = re.compile(r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}\b", re.IGNORECASE)
-            mails = re.findall(regex, conf.ldap_filter)
+                ldap_result_id = con.search(conf.ldap_base, ldap.SCOPE_SUBTREE, searchFilter, ['objectclass']) 
+                result_type, result_data = con.result(ldap_result_id, 0) 
+                objectclass = result_data[0][1]['objectClass']
+                objectclass.append('perfectInfo')
 
-            atts = {
-                'sn': self.last_name.encode('utf-8'),
-                'givenName': self.first_name.encode('utf-8'),
-            }
+                regex = re.compile(r"\b[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}\b", re.IGNORECASE)
+                mails = re.findall(regex, conf.ldap_filter)
 
-            dn = "%s,%s" % (searchFilter, conf.ldap_base)
-            update_att = []
-            for k,v in atts.iteritems():
-                tup = (ldap.MOD_REPLACE, k, v)
-                update_att.append(tup)
-            update_att.append((ldap.MOD_ADD, 'memberOfGroup', list(map(lambda x:x.encode('utf-8'), mails))))
+                manager = employee.department_id.manager_id.user_id if employee.department_id.manager_id else None
+                
+                osrole = []
+                for roles in employee.role:
+                    rid = roles.o_id
+                    osrole.append(str(rid))
 
-            try:
-                con.modify_s(dn,update_att)
-            except ldap.LDAPError,e:
-                _logger.error(u'%s' % e.message)
-            finally:
-                con.unbind_s()
+                atts = {
+                    'objectclass': list(set(objectclass)),
+                    'sn': self.last_name.encode('utf-8'),
+                    'givenName': self.first_name.encode('utf-8'),
+                    'chineseName': employee.name.encode('utf-8') or None,
+                    'departmentNumber': str(employee.department_id.os_department_id) or None,
+                    'superior' : (manager.email.encode('utf-8') or manager.login.encode('utf-8')) if manager else None,
+                    'osRole': osrole or None,
+                }
+
+                dn = "%s,%s" % (searchFilter, conf.ldap_base)
+                update_att = []
+                for k,v in atts.iteritems():
+                    tup = (ldap.MOD_REPLACE, k, v)
+                    update_att.append(tup)
+                update_att.append((ldap.MOD_ADD, 'memberOfGroup', list(map(lambda x:x.encode('utf-8'), mails))))
+
+                try:
+                    con.modify_s(dn,update_att)
+                except ldap.LDAPError,e:
+                    _logger.error(u'%s' % e.message)
+                finally:
+                    con.unbind_s()
     
+    # 账号进加密LDAP
     @api.multi
     def new_encryption(self):
         user = {
@@ -186,7 +214,7 @@ class set_approval(models.TransientModel):
             'userPassword': self.password,
         }
 
-        url = "httpshttpshttpshttpshttps"
+        url = "https:######################"
 
         cbuffer = cStringIO.StringIO()
         curl = pycurl.Curl()
@@ -209,35 +237,32 @@ class set_approval(models.TransientModel):
     def action_save(self):
         eids = self._context.get('active_id','') 
         employee = self.env['hr.employee'].browse(eids)
-        test = self.env['hr.employee'].test_ldap(employee)
-        if test:
+        if self.env['hr.employee'].test_ldap(employee):
             status = self.check_email()
             if status == 'failed':
                 user_id = self.new_user()
 
                 if user_id:
-                    employee.user_id = user_id
+                    employee.write({
+                        'user_id': user_id,
+                        'hr_number': self.hr_number,
+                        'work_email': self.mail,
+                        'hr_englishname': self.first_name
+                        })
 
                     if employee.user_id:
                         email, message = self.new_email()
                         if email == 'failed':
                             raise ValidationError(message)
                         else:
-                            self.new_email_completion()
-                            self.new_encryption()
-                            self.env['hr.employee'].update_ldap(eids)
+                            self.new_email_completion()# 补全账号
+                            self.new_encryption()# 新加密
                             employee.write({
                                 'state': 'exam',
                                 'active': True,
                                 'work_email': self.mail,
                                 'default_password': self.password,
                                 })
-                            # self.env['recruitment.survey.notice'].with_context({
-                            #     'default_mail_to': self.id,
-                            #     'user': user_id.id,
-                            #     'name': employee.name,
-                            #     'survey_ids': self.survey_questions.ids
-                            #     }).notice_mail()
             else:
                 raise ValidationError('邮箱地址已经存在')
         else:

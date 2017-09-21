@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 import base64
 import ldap
+import cStringIO
+import pycurl
+import json
+import urllib
 from openerp import models, fields, api, SUPERUSER_ID
 from openerp.tools.translate import _
 from openerp.exceptions import ValidationError
-
 import logging
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger(__name__)
@@ -31,17 +34,9 @@ class officeManager(models.Model):
     _inherit = ['hr.employee', 'ir.needaction_mixin']
 
     role = fields.Many2many('hr.employee.os', 'hr_employee_os_rel', 'id', 'o_id',string='OS权限', track_visibility='onchange')
-    # 将员工信息作为依据在之后的入职中建立账号
     create_mail = fields.Boolean(string=u'是否创建账号')
     default_password = fields.Char(string=u'初始密码', readonly=True)
-
     survey_questions = fields.Many2many('survey.survey', 'hr_employee_survey_rel', 'id', 'sid',string='测试问卷')
-
-    # 显示人数
-    @api.model
-    def _needaction_count(self, domain=None):
-        if domain:
-            return self.search_count(domain or [])
 
     # 保存按钮
     @api.multi
@@ -122,36 +117,17 @@ class officeManager(models.Model):
             _logger.error('An LDAP exception occurred: %s', e)
         return con or False
 
-    state = fields.Selection([('draft','待审核'),('underway','审核中'),('ready','待到岗'),('exam','入职考试')],string='审批状态', track_visibility='onchange')
+    state = fields.Selection([
+        ('draft','待审核'),
+        ('underway','审核中'),
+        ('ready','待到岗'),
+        ('exam','入职测试'),
+        ('done','在职'),
+        ('leaving','离职中'),
+        ('left','已离职')
+        ], string='审批状态', track_visibility='onchange')
 
-    # def notify_perso_domain(self, cr, uid, ids, context=None):
-    #     res = {}
-    #     res['domain'] = {}
-    #     group1, res_id1 = self.pool.get('ir.model.data').get_object_reference(cr, SUPERUSER_ID, 'base', 'group_hr_user')
-    #     group2, res_id2 = self.pool.get('ir.model.data').get_object_reference(cr, SUPERUSER_ID, 'base', 'group_hr_manager')
-
-    #     accounts = self.pool.get('res.users').search(cr, SUPERUSER_ID, [('groups_id','=',[res_id1,res_id2])], context=context)
-    #     accounts = list(reversed(accounts))
-    #     res['domain']['notify_person'] = [('id', 'in', accounts)]
-    #     return res
-
-    # notify_person = fields.Many2one('res.users', string='通知人', help='通常是账号开通申请的发件人', required=True)
     approvers_line = fields.One2many('hr.employee.approvers', 'a_id', track_visibility='onchange')
-
-    #因为源码onchange写在view，所以@api.onchange无效，重写此函数
-    def onchange_department_id(self, cr, uid, ids, department_id, context=None):
-        value = {'parent_id': False}
-        department = self.pool.get('hr.department').browse(cr, uid, department_id, context)
-        value['parent_id'] = department.manager_id.id
-        # 修改部门后删除审批人
-        commands = []
-        for eid in ids:
-            employee = self.pool.get('hr.employee').browse(cr, uid, eid, context)
-            commands = [(2, line_id.id) for line_id in employee.approvers_line]#删除主从链接关系，删除内容
-            value['approvers_line'] = commands
-            if employee.state=='underway':
-                value['state'] = 'draft'
-        return {'value': value}
 
     #测试ldap连接是否成功
     def test_ldap(self, employee=None):
@@ -171,42 +147,62 @@ class officeManager(models.Model):
                     pass
             return con or False
 
-    @api.one
+    # 读取部门入职审批级数，追加上级部门的管理人
+    # 如果需要独立的审批人，使用other_approvers
     @api.constrains('department_id')
-    def set_approval(self):
+    def set_approval(self, other_approvers=None):
+        commands = []
         if self.department_id:
-            for info in self:
-                department = info.department_id
-                series = department.series
-                commands = [(2, line_id.id, False) for line_id in info.approvers_line]
-                if series == 0:
-                    while department:
-                        if department.manager_id.user_id.id != False:
-                            vals = (0, 0, {
-                            'a_id': info.id,
-                            'approver': department.manager_id.id,
-                            })
-                            # if vals not in commands:
-                            commands.append(vals)#添加主从链接关系
-                        department = department.parent_id
-                if series > 0:
-                    for num in range(0, series):
-                        if department.manager_id.user_id.id != False:
-                            vals = (0, 0, {
-                            'a_id': info.id,
-                            'approver': department.manager_id.id,
-                            })
-                            # if vals not in commands:
-                            commands.append(vals)#添加主从链接关系
-                        department = department.parent_id
-                info.write({
-                    'approvers_line' : commands
-                    })
+            department = self.department_id
+            series = department.series
+            if other_approvers:
+                # other_approvers存在时说明需要上级以外的审批人，替换所有审批人
+                commands = [(2, line.id, False) for line in self.approvers_line]
+            else:
+                # other_approvers不存在说明修改的是部门，不动其他审批人的情况下，清空上级审批人
+                commands = [(2, line.id, False) for line in self.approvers_line if line.post == 'superior']
+
+            if series == 0:
+                while department:
+                    if department.manager_id.user_id.id != False:
+                        vals = (0, 0, {
+                        'a_id': self.id,
+                        'post': 'superior',
+                        'approver': department.manager_id.id,
+                        })
+                        commands.append(vals)#添加主从链接关系
+                    department = department.parent_id
+            if series > 0:
+                for num in range(0, series):
+                    if department.manager_id.user_id.id != False:
+                        vals = (0, 0, {
+                        'a_id': self.id,
+                        'post': 'superior',
+                        'approver': department.manager_id.id,
+                        })
+                        commands.append(vals)#添加主从链接关系
+                    department = department.parent_id
+
+        if other_approvers:
+            for post, other_approver in other_approvers.items():
+                vals = (0, 0, {
+                        'a_id': self.id,
+                        'post': post,   # superior-上级，administrative-行政，information-IT，personnel-人事
+                        'approver': other_approver,
+                        })
+                commands.append(vals)
+
+        if commands != []:
+            self.write({
+                'approvers_line' : commands
+                })
+            return True
+        return False
 
     #更新ldap端字段
     @api.multi
     def update_ldap(self, employee_id):
-        employees = self.env['hr.employee'].browse(employee_id)
+        employees = self.browse(employee_id)
 
         for employee in employees:
             # OS权限角色
@@ -222,7 +218,7 @@ class officeManager(models.Model):
             searchScope = ldap.SCOPE_SUBTREE
             retrieveAttributes = ['objectclass']
 
-            for conf in employee.company_id.ldaps:#遍历账号所属公司ldap配置，向LDAP修改objectClass、中文名、OS权限、
+            for conf in employee.company_id.ldaps:#遍历账号所属公司ldap配置，向LDAP修改objectClass、中文名、OS权限
                 con = self.connect(conf)
                 con.protocal_version = ldap.VERSION3
                 ldap_result_id = con.search(conf.ldap_base, searchScope, searchFilter, retrieveAttributes) 
@@ -251,22 +247,10 @@ class officeManager(models.Model):
                 finally:
                     con.unbind_s()
 
-    # 发送审批邮件至审批人，把“被审批员工id-收件审批人id-yes/no“加密为base64密文，作为回复内容
-    # 新增fetchmail.server，和对应的ir.model和ir.actions.server
-    # ir.actions.server代码为：
-    #       message = self.pool['mail.message'].search(cr, uid, [('model','=','employee.id'),('res_id','=',obj.id)],context=context)
-    #       self.pool['hr.employee'].set_pass_by_mail(cr, uid, message[0], context=context)
-    @api.one
-    def start_approval(self):
-        for approver in self.approvers_line:
-            info = str(self.id) + '-' + str(approver.name.id) + '-' + 'through'
-            body_yes = base64.encodestring(info)
-
-            info = str(self.id) + '-' + str(approver.name.id) + '-' + 'notthrough'
-            body_no = base64.encodestring(info)
-
-            subject = u"""新员工%s入职申请，请审批""" % (self.name or '')
-            body = u"""
+    # 上级审批邮件
+    def _prepare_email_for_superior(self, body_yes, body_no):
+        subject = u"""新员工%s入职申请，请审批""" % (self.name or '')
+        body = u"""
                 <!DOCTYPE html>
                 <html>  
                 <head>
@@ -315,8 +299,8 @@ class officeManager(models.Model):
                 </style>
                 </head>
                 <body>
-                  <a href="mailto:@@@@@@@@@@@@@@@@@@@@@@@@?subject=employee/%s&amp;body=Send**this**code**to**say**YES:((%s))">通过</a>
-                  <a href="mailto:@@@@@@@@@@@@@@@@@@@@@@@@?subject=employee/%s&amp;body=Send**this**code**to**say**NO:((%s))">拒绝</a>
+                  <a href="mailto:@@@@@@@@@@@@@@@@@?subject=employee/%s&amp;body=Send**this**code**to**say**YES:((%s))">通过</a>
+                  <a href="mailto:@@@@@@@@@@@@@@@@@?subject=employee/%s&amp;body=Send**this**code**to**say**NO:((%s))">拒绝</a>
                   <table>
                       <tr>
                         <th>员工编号</th>
@@ -407,16 +391,165 @@ class officeManager(models.Model):
                     self.recommendation or '',
                     self.referrer or '',
                     )
+        return subject, body
+
+    # 离职邮件需要上级、行政、IT邮件确认，
+    def _prepare_email_for_superior_leaving(self, body_yes='', body_no='', post='superior', action_id=None):
+        skip_mail_approval = False
+        
+        if post == 'administrative':
+            subject = u"""员工%s现离职，请确认固定资产情况""" % (self.name or '')
+        elif post == 'information':
+            subject = u"""员工%s现离职，请确认信息安全情况""" % (self.name or '')
+        elif post == 'personnel':
+            subject = u"""员工%s现离职，审批人全部通过，请至ERP关闭账号""" % (self.name or '')
+            skip_mail_approval = True
+        else:
+            subject = u"""员工%s现离职, 请审批""" % (self.name or '')
+
+        href = ''
+        if not skip_mail_approval:
+            href = u"""            
+                      <a href="mailto:@@@@@@@@@@@@@@@@@?subject=employee/%s&amp;body=Send**this**code**to**say**YES:((%s))">通过</a>
+                      <a href="mailto:@@@@@@@@@@@@@@@@@?subject=employee/%s&amp;body=Send**this**code**to**say**NO:((%s))">拒绝</a>
+                    """% (
+                        self.id,
+                        body_yes,
+                        self.id,
+                        body_no,
+                    )
+        else:
+            href = u"""<a href='%s'>点击查看该员工</a>"""% (
+                            'http://######/web/#id=%s&view_type=form&model=hr.employee&action=%s'%(self.id, action_id)
+                        )
+
+        body = u"""
+                <!DOCTYPE html>
+                <html>  
+                <head>
+                  <style type="text/css"> 
+                    body { 
+                        font: normal 11px auto "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+                        padding: 0;
+                        margin: 0;
+                    }
+                    table {
+                        width: 700px;
+                        padding: 0;
+                        margin: 0 4 0 4;
+                    }
+                    caption {
+                        padding: 0 0 5px 0;
+                        width: 700px;
+                        font: italic 11px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+                        text-align: right;
+                    }
+                    th {
+                        font: bold 11px "Trebuchet MS", Verdana, Arial, Helvetica, sans-serif;
+                        color: #4f6b72;
+                        border-right: 1px solid #C1DAD7;
+                        border-bottom: 1px solid #C1DAD7;
+                        border-top: 1px solid #C1DAD7;
+                        letter-spacing: 2px;
+                        text-transform: uppercase;
+                        text-align: left;
+                        padding: 6px 6px 6px 12px;
+                    }
+                    tr {
+                        background: #E6EAE9;
+                    }
+                    td {
+                        border-right: 1px solid #C1DAD7;
+                        border-bottom: 1px solid #C1DAD7;
+                        background: #fff;
+                        font-size:11px;
+                        padding: 6px 6px 6px 12px;
+                        color: #4f6b72;
+                    }
+                    a {
+                        font-size: 27px;
+                    }
+                </style>
+                </head>
+                    <body>
+                        <table>
+                            <tr>
+                                <th>员工编号</th>
+                                <th>邮箱</th>
+                                <th>职位级别</th>
+                                <th>姓名</th>
+                                <th>公司</th>
+                                <th>所属中心</th>
+                                <th>部门</th>
+                                <th>岗位</th>
+                                <th>直接上级</th>
+                            </tr>
+                            <tbody>
+                                <tr>
+                                    <td>%s</td>
+                                    <td>%s</td>
+                                    <td>%s</td>
+                                    <td>%s</td>
+                                    <td>%s</td>
+                                    <td>%s</td>
+                                    <td>%s</td>
+                                    <td>%s</td>
+                                    <td>%s</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        %s
+                    </body>
+                </html>
+                """% (
+                        self.hr_number or '',
+                        self.work_email or '',
+                        self.hr_level or '',
+                        self.name or '',
+                        self.company_id.name or '',
+                        self.center_id.name or '',
+                        self.department_id.name or '',
+                        self.job_id.name or '',
+                        self.coach_id.name or '',
+                        href
+                    )
+        
+        return subject, body
+
+    # 发送审批邮件至审批人，把“被审批员工id-收件审批人id-yes/no“加密为base64密文，作为回复内容
+    # act设定为entry、leave，对应入职和离职邮件
+    # 新增fetchmail.server，和对应的ir.model和ir.actions.server
+    # ir.actions.server代码为：
+    #       message = self.pool['mail.message'].search(cr, uid, [('model','=','employee.id'),('res_id','=',obj.id)],context=context)
+    #       self.set_pass_by_mail(cr, uid, message[0], context=context)
+    @api.multi
+    def start_approval(self, act='entry'):
+        for approver in self.approvers_line:
+            if act == 'leave' and approver.post == 'personnel': # 排除人事邮件，延后至其他人通过后收到邮件
+                continue
+
+            info = str(self.id) + '-' + str(approver.name.id) + '-' + 'through'
+            body_yes = base64.encodestring(info)
+
+            info = str(self.id) + '-' + str(approver.name.id) + '-' + 'notthrough'
+            body_no = base64.encodestring(info)
+
+            if act == 'leave':
+                subject, body = self._prepare_email_for_superior_leaving(body_yes=body_yes,body_no=body_no,post=approver.post,action_id=None)
+            elif act == 'entry':
+                subject, body = self._prepare_email_for_superior(body_yes=body_yes,body_no=body_no)
 
             try:
                 vals = {'subject':subject,'body_html':body,'email_from':self.env.user.email,'email_to':approver.name.email or approver.name.login,'reply_to':False}
-                mail_mail_obj = self.env['mail.mail']
-                mail = mail_mail_obj.create(vals)
+                mail_mail_obj = self.env['mail.mail'].create(vals)
                 mail.send()
             except:
                 continue
-
-        self.state = 'underway'
+        
+        if act == 'leave':
+            self.state = 'leaving'
+        else:
+            self.state = 'underway'
 
     #直接通过
     def pass_approval(self, cr, uid, ids, context=None):
@@ -435,24 +568,116 @@ class officeManager(models.Model):
         express = base64.decodestring(stri[s_state+2 : s_end])
         info = express.split('-')
 
-        employee = self.pool['hr.employee'].browse(cr, SUPERUSER_ID, int(info[0]), context=context)
+        employee = self.browse(cr, SUPERUSER_ID, int(info[0]), context=context)
         approver_id = int(info[1])
         if employee.approvers_line:
             con = True
+            other_mails = []
+            personnel_mails = []
             for approver in employee.approvers_line:
                 if approver.name.id == approver_id:
                     approver.state = info[2]
 
-                if approver.state != 'through':
+                if employee.state == 'underway' and approver.state != 'through':
                     con = False
                     break
 
-            if con == True:
+                elif employee.state == 'leaving' and approver.state != 'through':
+                    if approver.post != 'personnel':
+                        other_mails.append(approver.name.email)
+                    if approver.post == 'personnel':
+                        personnel_mails.append(approver.name.email)
+
+            # con为True，则审批人全部通过，进入到岗
+            if employee.state == 'underway' and con == True:
                 employee.update({
                     'state': 'ready',
                     })
 
-    # 弹出框用来发送测试邮件
+            # personnel_mail为True，则除人事外审批人全部通过，发给人事邮件
+            if employee.state == 'leaving' and personnel_mails != [] and other_mails == []:
+                action = self.env['ir.model.data'].xmlid_to_object('office_manager.act_menu_hr_employee_2_1')
+                for personnel_mail in personnel_mails:
+                    subject, body = self._prepare_email_for_superior_leaving(None,None,post='personnel', action_id=action.id if action else None)
+                    vals = {'subject':subject,'body_html':body,'email_from':self.env.user.email,'email_to':personnel_mail,'reply_to':False}
+                    mail_mail_obj = self.env['mail.mail'].create(vals)
+                    mail.send()
+
+    @api.multi
+    def start_leaving(self):
+        imd = self.env['ir.model.data']
+        form_view_id = imd.xmlid_to_res_id('office_manager.view_hr_employee_leaving_confirm_form')
+
+        result = {
+            'res_id': False,
+            'name': u'请选择相关人员',
+            'type': 'ir.actions.act_window',
+            'view_type': 'form',
+            'view_model': 'tree',
+            'res_model': 'hr.employee.leaving.confirm',
+            'views': [(form_view_id, 'form')],
+            'views_id': form_view_id,
+            'target': 'new',
+        }
+        return result
+
+    # 关闭账号
+    @api.multi
+    def close_account(self):
+        result = self.env['hr.employee.approvers'].search(['&','&',('a_id','=',self.id),('name','=',self.env.user.id),('post','=','personnel')])
+        is_pass = False
+        for res in result:
+            if res.state == 'through':
+                is_pass = True
+                break
+        if (not result) or is_pass:
+            raise ValidationError('您不是对应人事，或者您已完成您的任务')
+
+        mail = self.user_id.email or self.user_id.login
+        if mail:
+            searchFilter = "mail=%s" % mail
+
+            # 关闭邮箱
+            if self.test_ldap():
+                for conf in self.company_id.ldaps:#遍历账号所属公司ldap配置，从LDAP中关闭账号
+                    con = self.connect(conf)
+                    con.protocal_version = ldap.VERSION3
+                    dn = "%s,%s" % (searchFilter, conf.ldap_base)
+                    try:
+                        con.modify_s(dn,[(ldap.MOD_REPLACE, 'accountStatus', 'disable')])
+                    except ldap.LDAPError,e:
+                        _logger.error(u'%s' % e.message)
+                    finally:
+                        con.unbind_s()
+
+            # 移除加密，可以使用任意searchFilter，查询结果都会被删除，因为加密存在旧邮箱账号，所以使用uid
+            url = "https:######################"
+            searchFilter = 'uid=%s' % ((mail.split('@'))[0])
+            cbuffer = cStringIO.StringIO()
+            curl = pycurl.Curl()
+            curl.setopt(pycurl.SSL_VERIFYPEER, False)
+            curl.setopt(pycurl.POSTFIELDS, urllib.urlencode({'searchFilter': searchFilter}))
+            curl.setopt(pycurl.URL, url)
+            curl.setopt(pycurl.WRITEFUNCTION, cbuffer.write)
+            curl.perform()
+            cbuffer.close()
+
+            # 状态变为离职，并归档
+            con = True
+            for approver in self.approvers_line:
+                if approver.name.id == self.env.user.id:
+                    approver.state = 'through'
+                if approver.state != 'through':
+                    con = False
+
+            if con == True and self.state == 'leaving':
+                self.update({# 归档账号
+                    'state': 'left',
+                    'active': False,
+                    })
+                self.user_id.active = False# 归档用户
+
+    # 弹出框用来发送入职测试链接
     @api.multi
     def give_notice(self, spare_mail):
         if not self.survey_questions:
@@ -503,9 +728,6 @@ class officeManager(models.Model):
 
         return result
 
-    # @api.one
-    # def start_leaving(self):
-    #     raise ValidationError('尽请期待')
 
 # 这里是账号信息，放在按钮上
 from openerp.osv import fields, osv
